@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>X and O</title>
+  <link href="Styles.css" rel="stylesheet">
+    <style>
+        button {
+            
+            float:left;
+            position: absolute;
+            width: 200px;
+            height: 70px;
+            margin-left: 20px;
+            margin-top: 10px;
+            font-size: 25px;
+            font-weight: 200;
+            transition: .4s ease-in-out;
+        }
+        
+        button:hover {
+            cursor: pointer;
+            transform: scale(1.3) translateX(20px);;
+        }
+    </style>
+</head>
+
+<body class="body">
+	<header>
+		<h1 class="title">X and O</h1>
+	</header>
+    <div class="headerShadow">
+    </div>
+    <div class="background">
+	   <br>
+        <button onclick="location.href='../index.html'">Game Selector</button>
+	   <table>
+           <tr>
+               <td><div class="button-container" id="div-1"><h1 class="button-text" id="1-text"></h1></div></td>
+		       <td><div class="button-container" id="div-2"><h1 class="button-text" id="2-text"></h1></div></td>
+		       <td><div class="button-container" id="div-3"><h1 class="button-text" id="3-text"></h1></div></td>
+		   </tr>
+
+		   <tr>
+		       <td><div class="button-container" id="div-4"><h1 class="button-text" id="4-text"></h1></div></td>
+		       <td><div class="button-container" id="div-5"><h1 class="button-text" id="5-text"></h1></div></td>
+		       <td><div class="button-container" id="div-6"><h1 class="button-text" id="6-text"></h1></div></td>
+		   </tr>
+
+		   <tr>
+		       <td><div class="button-container" id="div-7"><h1 class="button-text" id="7-text"></h1></div></td>
+		       <td><div class="button-container" id="div-8"><h1 class="button-text" id="8-text"></h1></div></td>
+		       <td><div class="button-container" id="div-9"><h1 class="button-text" id="9-text"></h1></div></td>
+		   </tr>
+
+	 </table>
+    <br>
+    
+    </div>
+        <h1 class="playertext" id="player-label">Player Turn</h1> 
+        <div class="bodyShadow" id="jeff">
+        </div>
+        <br>
+        <div class="player-help-container">
+            <h1 class="player-logo-X" id="Xlogo">X</h1>
+            <h1 class="player-logo-O" id="Ologo">O</h1>
+            <br>
+            <br>
+            <br>
+            <br>
+            <h2 class="player-logo-text-X" id="Xtext">Player 1</h2>
+            <h2 class="player-logo-text-O" id="Otext">Player 2</h2>
+        </div>
+  <script src="game.js"></script>
+</body>
+
+</html>

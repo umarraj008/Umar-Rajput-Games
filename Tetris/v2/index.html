@@ -1,0 +1,156 @@
+<html>
+    <head>
+        <title>Tetris</title>
+		<link href="https://fonts.googleapis.com/css?family=Roboto:300,400,700&display=swap" rel="stylesheet">
+        <style>
+            body {
+                background: #000000;
+                color: #fff;
+                font-family: arial;
+                text-align: center;
+				display: block;
+				flex: auto;
+            }
+            
+			
+			.c2 {
+                border: solid .2em #fff;
+                height: 20%;
+				float: right;
+				margin-right: 17%;
+				
+            }
+			
+			.c2text {
+				float: right;
+				margin-right: 18%;
+				
+            }
+
+			.c {
+                border: solid .2em #fff;
+                height: 85vh;
+				margin-left: 3%;
+				float: left;
+                margin-top: 40px;
+            }
+			
+            div {
+                font-size: 80px;
+				float: right;
+            }
+			
+			.leaderboard {
+				float: left;
+				font-family: roboto;
+				padding-left: 15%;
+				text-align: right;
+				font-weight: 300;
+				
+			}
+            
+			span {
+				color: red;
+				font-size: 16px;
+				font-weight: 700;
+			}
+			
+            .scoreText {
+                float: inherit;
+                padding-right: 10%;
+        
+            }
+            
+            li {
+                font-size: 13px;
+            }
+            
+            .lText {
+                font-size: 40px;
+            }
+            
+            button {
+
+                float: left;
+                position: absolute;
+                width: 200px;
+                height: 70px;
+                margin-left: 70px;
+                margin-top: 10px;
+                font-size: 25px;
+                font-weight: 200;
+                transition: .4s ease-in-out;
+                z-index: 30;    
+                transform: translateY(300px);
+            }
+
+            button:hover {
+                cursor: pointer;
+                transform: scale(1.3) translateY(230px);
+            }
+			
+            
+            .num1 {
+                font-size: 22px;
+            }
+            
+            .num2 {
+                font-size: 22px;
+            }
+            
+            .num3 {
+                font-size: 22px;
+
+            }
+            
+            .num1 span{
+                color: #34fc2d;
+            }
+            
+            .num2 span{
+                color: #ebfc2d;
+            }
+            
+            .num3 span{
+                color: #fca22d;
+
+            }
+        </style>
+    </head>
+    <body id="body">
+        <ol class="leaderboard" id="leaderboard">
+			<h1 class="ltext"><center>Leaderboard</center></h1>
+
+        </ol>
+		<canvas class="c" id="tetris" width="240" height="400"></canvas>
+		<br>
+        <h1 class="scoreText">Score:</h1>
+        <div class="scoreText" id="score"></div>
+		<br>
+		<br>
+        <h1 class="c2text">Next Piece:</h1>
+		
+        <canvas class="c2" id="NextP" width="240" height="240"></canvas>
+        
+        <button onclick="location.href='../../index.html'">Game Selector</button>
+        
+		<script src="https://www.gstatic.com/firebasejs/6.2.4/firebase-app.js"></script>
+        <!--script src="https://www.gstatic.com/firebasejs/6.2.4/firebase.js"></script-->
+        <script src="https://www.gstatic.com/firebasejs/6.2.4/firebase-database.js"></script>
+        <script>
+            var firebaseConfig = {
+                apiKey: "AIzaSyBd1GoTHeKlRIF2DKvs-8zBUl5NoYmJugg",
+                authDomain: "tetris-fba18.firebaseapp.com",
+                databaseURL: "https://tetris-fba18.firebaseio.com",
+                projectId: "tetris-fba18",
+                storageBucket: "",
+                messagingSenderId: "730725312624",
+                appId: "1:730725312624:web:96a32a2fcc56dce3"
+              };
+        
+            firebase.initializeApp(firebaseConfig);
+        </script>
+        
+        <script src="tetris.js"></script>
+    </body>
+</html>
