@@ -22,7 +22,7 @@ var ballSpeed;
 var dificulty = 1;
 
 var difficultySpeed = 0.5;
-
+var paddleOffset;
 
 var testing1 = false;
 var testing2 = false;
@@ -66,7 +66,7 @@ var ball = {
     vx: 0,
     vy: 0,
     a: 0,
-    s: 0.4,
+    s: 2,
 };
 
 var ball2 = {
@@ -400,7 +400,7 @@ function update(time = 0) {
 
 function PlayerReset() {
     player1.y = 540;
-    player2.y = c.width / 2;
+    player2.y = 540;
     ballSpeed = difficultySpeed;
     
     ball.x = c.width / 2;
@@ -422,8 +422,8 @@ function ThrowBallInRandomDirection() {
             ball.vy = ballSpeed;
         }
         
-        ball.r = -getRandomArbitrary(30, 150);
-        ball.a =  ball.r * (Math.PI / 180);
+        //ball.r = ;
+        ball.a =  -getRandomArbitrary(0, 360);
     }, 3000);
     
     if (GameMode1) {
@@ -484,11 +484,13 @@ function BallMovement() {
     
     //top wall
     if (ball.y <= 0) {
+        ball.y += ballSpeed;
         ball.vy = -ball.vy;
     }
     
     //bottom wall
     if (ball.y >= c.height) {
+        ball.y -= ballSpeed;
         ball.vy = -ball.vy;
     }
     
@@ -498,27 +500,47 @@ function BallMovement() {
         
         let angle = Math.atan2(-ball.vy, -ball.vx);
         
-        angle += (Math.random() * Math.PI / 2 - Math.PI / 4) * ball.s;
+        angle -= (Math.random() * Math.PI / 2 - Math.PI / 4) * ball.s;
         ball.a = angle;
+        
+        if (ball.a < Math.PI / 6) {
+            ball.a = Math.PI / 6;
+        }else if(ball.a > Math.PI * 5 / 6) {
+            ball.a = Math.PI * 5 / 6;
+        }
+        
+        
         
         ball.vy = -ball.vy;
         ball.vx = -ball.vx;
         
-        ballSpeed += 0.02;
+        
+        ballSpeed += 0.04;
     }
     
     //player 2 Bounce
     if ((ball.y < player2.y + 100 && ball.y > player2.y - 100) && 
         (ball.x < player2.x && ball.x > player2.x - 20)) {
         
+        RandomPaddleOffset();
+        
         let angle = Math.atan2(-ball.vy, ball.vx);
         
         angle -= (Math.random() * Math.PI / 2 - Math.PI / 4) * ball.s;
         ball.a = angle;
+          
+        if (ball.a < Math.PI / 6) {
+            ball.a = Math.PI / 6;
+        }else if(ball.a > Math.PI * 5 / 6) {
+            ball.a = Math.PI * 5 / 6;
+        }
+        
+        
         
         ball.vy = -ball.vy;
         ball.vx = -ball.vx;
-        ballSpeed += 0.015;
+        
+        ballSpeed += 0.04;
     }
 }
 
@@ -535,24 +557,28 @@ function Ball2Movement() {
     
     //left wall
     if (ball2.x <= 10) {
+        ball2.x += 0.6;
         ball2.vx = -ball2.vx;
         
     }
     
     //right wall
     if (ball2.x >= 650.000002 - 30) {
+        ball2.x -= 0.6;
         ball2.vx = -ball2.vx;
         
     }
     
     //top wall
     if (ball2.y <= 10) {
+        ball2.y += 0.6;
         ball2.vy = -ball2.vy;
         
     }
     
     //bottom wall
     if (ball2.y >= 780 - 10) {
+        ball2.y -= 0.6;
         ball2.vy = -ball2.vy;
        
     }
@@ -568,7 +594,7 @@ function Ball2Movement() {
 function paddleMove() {
     
     if (dificulty == 1) {
-        compSpeed = 5
+        compSpeed = 4
     }else if (dificulty == 2) {
         compSpeed = 7;
     }else if (dificulty == 3) {
@@ -599,10 +625,10 @@ function paddleMove() {
         
         if (player2.y !== ball.y) {
             
-            if (player2.y <= ball.y) {
+            if (player2.y + paddleOffset <= ball.y) {
                 player2.y += compSpeed;
 
-            } else if (player2.y >= ball.y) {
+            } else if (player2.y - paddleOffset >= ball.y) {
                 player2.y -= compSpeed;
             }
         }
@@ -626,6 +652,11 @@ function paddleMove() {
     }
     
 }
+
+function RandomPaddleOffset() {
+    paddleOffset = getRandomArbitrary(0, 100);
+}
+
 
 function selectRandomPlayerToStart() {
     Player1Start = Math.random() >= 0.5;
@@ -839,5 +870,5 @@ document.addEventListener("click", event => {
     
 });
 
-
+RandomPaddleOffset();
 update();
