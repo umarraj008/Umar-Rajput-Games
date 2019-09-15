@@ -102,6 +102,12 @@ function draw() {
 
         if (!StartGame) {
 
+            //dev note
+            ctx.fillStyle = "white";
+            ctx.font = "20px roboto";
+            ctx.fillText("Ball May be Glitchy", 100, 30);
+            ctx.fillText("Will Be Fixed Soon", 99, 55);
+            
             //ball for show
             ctx.fillStyle = "#c1ff87";
             ctx.beginPath();
