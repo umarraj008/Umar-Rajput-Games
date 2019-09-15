@@ -562,11 +562,11 @@ function Ball2Movement() {
 function paddleMove() {
     
     if (dificulty == 1) {
-        compSpeed = 4
+        compSpeed = 5
     }else if (dificulty == 2) {
-        compSpeed = 5;
+        compSpeed = 7;
     }else if (dificulty == 3) {
-        compSpeed = 8;
+        compSpeed = 9;
     }
     
     
