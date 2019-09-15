@@ -22,6 +22,8 @@ var snakeLength = 1;
 var direction;
 var moveCounter = 0;
 var moveInterval = 100;
+var selectCol = true;
+var aiON = false;
 
 var goUp;
 var goDown;
@@ -33,6 +35,24 @@ var inputKey;
 
 var BackColor = "black"
 var NumBackColor = "#242424"
+
+var colors = [
+    {back: "#ff4516", num: "#ffb916"},
+    {back: "#923fff", num: "#ff3fac"},
+    {back: "#36c6ff", num: "#80ff36"},
+    {back: "#fff153", num: "#70ff53"},
+    {back: "#93ffc4", num: "#aa93ff"},
+    {back: "#c3ff62", num: "#f062fd"},
+    {back: "#c47cff", num: "#7cf0ff"},
+    {back: "#fd75ff", num: "#ff7577"},
+    {back: "#4afcff", num: "#a1ff4a"},
+    {back: "#ff53cb", num: "#ff6d53"},
+    {back: "#1aff5b", num: "#e0ff1a"},
+    {back: "#7462ff", num: "#ff62ed"},
+    {back: "#ff9e61", num: "#ffed61"},
+    {back: "#a3f7ff", num: "#d4a3ff"},
+    {back: "#ffcb3b", num: "#a7ff3b"},
+];
 
 function draw() {
     //background
@@ -46,25 +66,17 @@ function draw() {
     if (snakeLength > 99) {
         ctx.font = "22px Roboto";
         ctx.fillText(snakeLength, 19, 28);
-        ctx.strokeStyle = "black";
-        ctx.lineWidth = 0.15;
-        ctx.strokeText(snakeLength, 19, 28);
-        
+               
 
     } else if (snakeLength > 9){
         ctx.font = "35px Roboto";
         ctx.fillText(snakeLength, 19.5, 33);
-        ctx.strokeStyle = "black";
-        ctx.lineWidth = 0.15;
-        ctx.strokeText(snakeLength, 19.5, 33);
+        
 
     } else {
         ctx.font = "50px Roboto";
         ctx.fillText(snakeLength, 19, 37);
-        ctx.strokeStyle = "black";
-        ctx.lineWidth = 0.15;
-        ctx.strokeText(snakeLength, 19, 37);
-
+            
     }
     ctx.textAlign = "left";
 
@@ -77,6 +89,41 @@ function draw() {
     //inner snake square
     ctx.fillStyle = "lime";    
     ctx.fillRect(player.x + 0.1, player.y + 0.1, 1 - 0.2, 1 - 0.2);
+    
+    //ai direction
+    if (aiON) {
+        switch (true) {
+            case goLeft:
+                ctx.fillStyle = "red";    
+                ctx.fillRect(player.x - 1, player.y, 1, 1);
+                ctx.fillStyle = BackColor;    
+                ctx.fillRect(player.x + 0.1 - 1, player.y + 0.1, 1 - 0.2, 1 - 0.2);
+                break;
+                
+            case goRight:
+                ctx.fillStyle = "red";    
+                ctx.fillRect(player.x + 1,  player.y, 1, 1);
+                ctx.fillStyle = BackColor;    
+                ctx.fillRect(player.x + 0.1 + 1, player.y + 0.1, 1 - 0.2, 1 - 0.2);
+                break;
+                
+            case goUp:
+                ctx.fillStyle = "red";    
+                ctx.fillRect(player.x, player.y - 1, 1, 1);
+                ctx.fillStyle = BackColor;    
+                ctx.fillRect(player.x + 0.1, player.y + 0.1 - 1, 1 - 0.2, 1 - 0.2);
+                break;
+                
+            case goDown:
+                ctx.fillStyle = "red";    
+                ctx.fillRect(player.x, player.y + 1, 1, 1);
+                ctx.fillStyle = BackColor;    
+                ctx.fillRect(player.x + 0.1, player.y + 0.1 + 1, 1 - 0.2, 1 - 0.2);
+                break;
+        }
+        
+    }
+    
     
     for (i = 0; i < snake.length; i++) {
     
@@ -182,89 +229,324 @@ function update(time = 0) {
         CheckForDeaths();
         eatingFruit();
         
+        if (aiON){
+            ai()
+            
+        }
         
         moveCounter = 0;
     }
     
+    
     draw();
-    document.getElementById("body").style.background = NumBackColor
     requestAnimationFrame(update);
 }
 
+function pickRandomColorBack() {
+    if (selectCol) {
+        let val = getRandomInt(0, 14);
+
+        while (colors[val].back == BackColor) {
+            let val = getRandomInt(0, 14);
+        }
+
+        
+        BackColor = colors[val].back;
+        NumBackColor = colors[val].num;
+        selectCol = false;
+    }
+}
+
+let amount = 1;
+
+function aiMoveLeft() {
+    for (i = 0; i < snakeLength; i++) {
+        if ((player.x - 1 == snake[i].x && player.y == snake[i].y) || goRight || player.x - 1 == -1 || lastMove[lastMove.length] == "r") {
+            return false;
+        }else if (i == snakeLength - amount) {
+            return true;
+        }
+    }  
+}
+
+function aiMoveRight() {
+    for (i = 0; i < snakeLength; i++) {
+        if ((player.x + 1 == snake[i].x && player.y == snake[i].y) || goLeft || player.x + 1 == 40 || lastMove[lastMove.length] == "l") {
+            return false;
+
+        }else if (i == snakeLength - amount) {
+            return true;
+        }
+    }
+}
+
+function aiMoveUp() {
+    for (i = 0; i < snakeLength; i++) {
+        if ((player.y - 1 == snake[i].y && player.x == snake[i].x) || goDown || player.y - 1 == -1 || lastMove[lastMove.length] == "d") {
+            return false;
+        }else if (i == snakeLength - amount) {
+            return true;
+        }
+    }
+}
+
+function aiMoveDown() {
+    for (i = 0; i < snakeLength; i++) {
+        if ((player.y + 1 == snake[i].y && player.x == snake[i].x) || goUp || player.y + 1 == 40 || lastMove[lastMove.length] == "u") {
+            return false;
+
+        }else if (i == snakeLength - amount) {
+            return true;
+        }
+    }
+}
+
+var lastMove = [];
+
+function MOVE(dir) {
+    
+    if (dir == "l") {
+        goLeft = true;
+        lastMove.push("l")
+        console.log("LEFT")
+    }else { goLeft = false; }
+  
+    
+    if (dir == "r") {
+        goRight = true;
+        lastMove.push("r")
+        console.log("RIGHT")
+
+    }else { goRight = false; }
+  
+    
+    if (dir == "u") {
+        goUp = true;
+        lastMove.push("u")
+        console.log("UP")
+
+    }else { goUp = false; }
+  
+    
+    if (dir == "d") {
+        goDown = true;
+        lastMove.push("d")
+        console.log("DOWN")
+
+    }else { goDown = false; }
+  
+}
+
+
+function ai() {
+    try {
+        gameStart = false;
+        //not at x
+        if (player.x != fruit.x) {
+
+            if (player.x > fruit.x) {
+                //left
+
+                if (aiMoveLeft()) {
+                    MOVE("l");
+
+                }else {
+                    if (aiMoveUp()) {
+                        MOVE("u")
+
+                    }else {
+                        MOVE("d") 
+                    }
+                }                    
+
+
+            }else if (player.x < fruit.x) {
+                //right
+
+                if (aiMoveRight()) {
+                     MOVE("r");
+
+
+                }else {
+                    if (aiMoveDown()) {
+                        MOVE("d")
+
+
+
+                    }else {
+                        MOVE("u")
+
+
+                    }
+                }
+            }
+
+
+
+        } else if (player.y != fruit.y){
+
+            if (player.y > fruit.y) {
+
+                //up
+
+                if (aiMoveUp()) {
+                     MOVE("u");
+
+
+
+
+                }else {
+                    if (aiMoveRight()) {
+                        MOVE("r")
+
+
+
+                    }else {
+                        MOVE("l")
+
+                    }
+                }
+
+
+
+            }else if (player.y < fruit.y) {
+                //down
+
+                if (aiMoveDown()) {
+                     MOVE("d");
+
+
+
+
+                }else {
+                    if (aiMoveLeft()) {
+                        MOVE("l")
+
+
+
+                    }else {
+                        MOVE("r")
+
+                    }
+                }
+            }
+        }
+    }
+    
+    catch(error) {
+        console.error("ai crashed: " + error);
+        alert("ai crashed: " + error);
+        location.reload();
+    }
+}
+    
 
 function backgroundStuffs() {
     switch (snakeLength) {
+        case 9:
+            selectCol = true;
+            break;
+            
         case 10:
-            BackColor = "#ff4516"
-            NumBackColor = "#ffb916"
+            pickRandomColorBack();    
             break;
+        case 19:
+            selectCol = true;
+            break;
+            
         case 20:
-            BackColor = "#923fff"
-            NumBackColor = "#ff3fac"
+            pickRandomColorBack();
             break;
+        case 29:
+            selectCol = true;
+            break;
+            
         case 30:
-            BackColor = "#36c6ff"
-            NumBackColor = "#80ff36"
+            pickRandomColorBack();
+            break;
+        case 39:
+            selectCol = true;
             break;
             
         case 40:
-            BackColor = "#fff153"
-            NumBackColor = "#70ff53"
+            pickRandomColorBack();
+            break;
+        case 49:
+            selectCol = true;
             break;
             
         case 50:
-            BackColor = "#93ffc4"
-            NumBackColor = "#aa93ff"
+            pickRandomColorBack();
+            break;
+        case 59:
+            selectCol = true;
             break;
             
         case 60:
-            BackColor = "#c3ff62"
-            NumBackColor = "#f062fd"
+            pickRandomColorBack();
+            break;
+        case 69:
+            selectCol = true;
             break;
             
         case 70:
-            BackColor = "#c47cff"
-            NumBackColor = "#7cf0ff"
+            pickRandomColorBack();
+            break;
+        case 79:
+            selectCol = true;
             break;
             
         case 80:
-            BackColor = "#fd75ff"
-            NumBackColor = "#ff7577"
+            pickRandomColorBack();
+            break;
+        case 89:
+            selectCol = true;
             break;
             
         case 90:
-            BackColor = "#4afcff"
-            NumBackColor = "#a1ff4a"
+            pickRandomColorBack();
+            break;
+        case 99:
+            selectCol = true;
             break;
             
         case 100:
-            BackColor = "#ff53cb"
-            NumBackColor = "#ff6d53"
+            pickRandomColorBack();
+            break;
+        case 109:
+            selectCol = true;
             break;
             
         case 110:
-            BackColor = "#1aff5b"
-            NumBackColor = "#e0ff1a"
+            pickRandomColorBack();
             break
+            case 119:
+            selectCol = true;
+            break;
             
         case 120:
-            BackColor = "#7462ff"
-            NumBackColor = "#ff62ed"
+            pickRandomColorBack();
+            break;
+        case 129:
+            selectCol = true;
             break;
             
         case 130:
-            BackColor = "#ff9e61"
-            NumBackColor = "#ffed61"
+            pickRandomColorBack();
+            break;
+        case 139:
+            selectCol = true;
             break;
             
         case 140:
-            BackColor = "#a3f7ff"
-            NumBackColor = "#d4a3ff"
+            pickRandomColorBack();
+            break;
+        case 149:
+            selectCol = true;
             break;
             
         case 150:
-            BackColor = "#ffcb3b"
-            NumBackColor = "#a7ff3b"
+            pickRandomColorBack();
             break;
     }
 }
@@ -340,8 +622,10 @@ function Input() {
             goLeft = false;
         }
    }
+    
 }
 
+let key1 = false;
 
 //INPUT
 document.addEventListener("keydown", event => {
@@ -355,9 +639,29 @@ document.addEventListener("keydown", event => {
     if (dead) {
         location.reload();
     }
+    
+        
+    if (event.keyCode == 16) {
+        key1 = true;
+    }
+});
 
+document.addEventListener("keyup", event => {
+    if (event.keyCode == 16) {
+        key1 = false;
+    }
     
 });
+
+document.addEventListener("keypress", event => {
+    if (key1 && event.keyCode == 76) {
+        aiON = true;
+        console.log("ai started");
+    } 
+    
+    
+});
+
 
 document.addEventListener("click", event => {
    if (dead) {
