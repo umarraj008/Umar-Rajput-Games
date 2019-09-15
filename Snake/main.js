@@ -218,28 +218,37 @@ function CheckForDeaths() {
 }
 
 function update(time = 0) {
-    deltaTime = time - lastTime;
-    lastTime = time;
-    
-    moveCounter += deltaTime;
-    if (moveCounter > moveInterval) {
-        backgroundStuffs();
-        Input();
-        moveSnake();
-        CheckForDeaths();
-        eatingFruit();
-        
-        if (aiON){
-            ai()
-            
+    try {
+        deltaTime = time - lastTime;
+        lastTime = time;
+
+        moveCounter += deltaTime;
+        if (moveCounter > moveInterval) {
+            backgroundStuffs();
+            Input();
+            moveSnake();
+            CheckForDeaths();
+            eatingFruit();
+
+            if (aiON){
+                ai()
+
+            }
+
+            moveCounter = 0;
         }
-        
-        moveCounter = 0;
+
+
+        draw();
+        requestAnimationFrame(update);
+    
     }
     
-    
-    draw();
-    requestAnimationFrame(update);
+    catch(error) {
+        console.error("ai crashed: " + error);
+        alert("ai crashed: " + error);
+        location.reload();
+    }
 }
 
 function pickRandomColorBack() {
@@ -339,105 +348,99 @@ function MOVE(dir) {
 
 
 function ai() {
-    try {
-        gameStart = false;
-        //not at x
-        if (player.x != fruit.x) {
 
-            if (player.x > fruit.x) {
-                //left
+    gameStart = false;
+    //not at x
+    if (player.x != fruit.x) {
 
-                if (aiMoveLeft()) {
-                    MOVE("l");
+        if (player.x > fruit.x) {
+            //left
+
+            if (aiMoveLeft()) {
+                MOVE("l");
+
+            }else {
+                if (aiMoveUp()) {
+                    MOVE("u")
 
                 }else {
-                    if (aiMoveUp()) {
-                        MOVE("u")
-
-                    }else {
-                        MOVE("d") 
-                    }
-                }                    
+                    MOVE("d") 
+                }
+            }                    
 
 
-            }else if (player.x < fruit.x) {
-                //right
+        }else if (player.x < fruit.x) {
+            //right
 
+            if (aiMoveRight()) {
+                 MOVE("r");
+
+
+            }else {
+                if (aiMoveDown()) {
+                    MOVE("d")
+
+
+
+                }else {
+                    MOVE("u")
+
+
+                }
+            }
+        }
+
+
+
+    } else if (player.y != fruit.y){
+
+        if (player.y > fruit.y) {
+
+            //up
+
+            if (aiMoveUp()) {
+                 MOVE("u");
+
+
+
+
+            }else {
                 if (aiMoveRight()) {
-                     MOVE("r");
+                    MOVE("r")
+
 
 
                 }else {
-                    if (aiMoveDown()) {
-                        MOVE("d")
+                    MOVE("l")
 
-
-
-                    }else {
-                        MOVE("u")
-
-
-                    }
                 }
             }
 
 
 
-        } else if (player.y != fruit.y){
+        }else if (player.y < fruit.y) {
+            //down
 
-            if (player.y > fruit.y) {
-
-                //up
-
-                if (aiMoveUp()) {
-                     MOVE("u");
+            if (aiMoveDown()) {
+                 MOVE("d");
 
 
 
 
-                }else {
-                    if (aiMoveRight()) {
-                        MOVE("r")
-
-
-
-                    }else {
-                        MOVE("l")
-
-                    }
-                }
-
-
-
-            }else if (player.y < fruit.y) {
-                //down
-
-                if (aiMoveDown()) {
-                     MOVE("d");
-
+            }else {
+                if (aiMoveLeft()) {
+                    MOVE("l")
 
 
 
                 }else {
-                    if (aiMoveLeft()) {
-                        MOVE("l")
+                    MOVE("r")
 
-
-
-                    }else {
-                        MOVE("r")
-
-                    }
                 }
             }
         }
     }
     
-    catch(error) {
-        console.error("ai crashed: " + error);
-        alert("ai crashed: " + error);
-        location.reload();
-    }
 }
     
 
