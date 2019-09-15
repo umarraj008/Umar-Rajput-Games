@@ -657,7 +657,7 @@ function buttonHighlight() {
         bEasyHigh = false;
         bMedHigh = true;
         bHardHigh = false;
-        difficultySpeed = 0.8;
+        difficultySpeed = 0.7;
         ballSpeed = difficultySpeed;
         playerMoveSpeed = 9;
     }
@@ -666,7 +666,7 @@ function buttonHighlight() {
         bEasyHigh = false;
         bMedHigh = false;
         bHardHigh = true;
-        difficultySpeed = 1;
+        difficultySpeed = 0.9;
         ballSpeed = difficultySpeed;
         playerMoveSpeed = 12;
     }
