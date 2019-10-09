@@ -118,21 +118,31 @@
         </style>
     </head>
     <body id="body">
+        
         <ol class="leaderboard" id="leaderboard">
 			<h1 class="ltext"><center>Leaderboard</center></h1>
-
+            
         </ol>
-		<canvas class="c" id="tetris" width="240" height="400"></canvas>
+		
+        <canvas class="c" id="tetris" width="240" height="400"></canvas>
 		<br>
+        
         <h1 class="scoreText">Score:</h1>
         <div class="scoreText" id="score"></div>
+		
+        <br>
 		<br>
-		<br>
+        
         <h1 class="c2text">Next Piece:</h1>
 		
         <canvas class="c2" id="NextP" width="240" height="240"></canvas>
         
         <button onclick="location.href='../../index.html'">Game Selector</button>
+        
+        <p><b>Options</b></p>
+            <p><i>Shift + H</i>   (Toggle Guide)</p>
+            <p><i>Shift + G</i> (Toggle Grid)</p>
+            <p><i>Shift + F</i> (Toggle Flashing)</p>
         
 		<script src="https://www.gstatic.com/firebasejs/6.2.4/firebase-app.js"></script>
         <!--script src="https://www.gstatic.com/firebasejs/6.2.4/firebase.js"></script-->
@@ -150,7 +160,14 @@
         
             firebase.initializeApp(firebaseConfig);
         </script>
-        
+        <img src="block1.png" width="0" id="redBlock"/>
+        <img src="block2.png" width="0" id="greenBlock"/>
+        <img src="block3.png" width="0" id="bluelightBlock"/>
+        <img src="block4.png" width="0" id="pinkBlock"/>
+        <img src="block5.png" width="0" id="orangeBlock"/>
+        <img src="block6.png" width="0" id="yellowBlock"/>
+        <img src="block7.png" width="0" id="bluedarkBlock"/>
+        <img src="tetrisTitle.png" width="0" id="titleImg"/>
         <script src="tetris.js"></script>
     </body>
 </html>

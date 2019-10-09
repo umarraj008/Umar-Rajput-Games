@@ -28,6 +28,22 @@ var calcMat;
 
 var cheat = false;
 var flasher = true;
+var gridEnabled = true;
+var gameStarted = false;
+var guideEnabled = true;
+
+var titleImg = document.getElementById("titleImg");
+
+var blockImg = {
+    red: document.getElementById("redBlock"),
+    blue_light: document.getElementById("greenBlock"),
+    green: document.getElementById("bluelightBlock"),
+    pink: document.getElementById("pinkBlock"),
+    orange: document.getElementById("orangeBlock"),
+    yellow: document.getElementById("yellowBlock"),
+    blue_dark: document.getElementById("bluedarkBlock"),
+}
+
 
 function arenaSweep() {
     let rowCount = 1;
@@ -125,19 +141,33 @@ function createPiece(type) {
 
 function draw() {
     //arena
-    context.fillStyle = "#000";
+    context.fillStyle = "black";
     context.fillRect(0,0,canvas.width, canvas.height);
     
     drawMatrix(arena, {x:0, y:0})
     
-    //guide
-    
-    calcY = 0;
-    while (colision(arena, {matrix: calcMat, pos: {x: player.pos.x, y: calcY}}) == false) {
-        calcY++;
+    //grid
+    if (gridEnabled) {
+        for (i = 0; i < 14; i++) {
+            context.fillStyle = "#2e2e2e";
+            context.fillRect(i - 0.025, 0, 0.05, canvas.height);
+        }
+
+        for (i = 0; i < 21; i++) {
+            context.fillStyle = "#2e2e2e";
+            context.fillRect(0, i - 0.025, canvas.width, 0.05);
+        }
     }
-    calcY--;
-    drawMatrixGUIDE(calcMat, {x: player.pos.x, y: calcY});  
+    
+    //guide
+    if (guideEnabled) {
+        calcY = 0;
+        while (colision(arena, {matrix: calcMat, pos: {x: player.pos.x, y: calcY}}) == false) {
+            calcY++;
+        }
+        calcY--;
+        drawMatrixGUIDE(calcMat, {x: player.pos.x, y: calcY});  
+    }
     
     //player
     drawMatrix(player.matrix, player.pos);  
@@ -151,12 +181,51 @@ function draw() {
 function drawMatrix(matrix, offset) {
     matrix.forEach((row, y) => {
         row.forEach((value, x) => {
+            
+//            if (value !== 0) {
+//                context.fillStyle = colors[value];
+//                context.fillRect(x + offset.x,
+//                                 y + offset.y,
+//                                 1, 1);
+//            }
+            
+            
             if (value !== 0) {
-                context.fillStyle = colors[value];
-                context.fillRect(x + offset.x,
-                                 y + offset.y,
-                                 1, 1);
+                
+                switch (value) {
+                    case 1: context.drawImage(blockImg.red, x + offset.x, y + offset.y,1, 1);
+                        break;
+                        
+                    case 2: context.drawImage(blockImg.blue_light, x + offset.x, y + offset.y,1, 1);
+                        break;
+                        
+                    case 3: context.drawImage(blockImg.green, x + offset.x, y + offset.y,1, 1);
+                        break;
+                        
+                    case 4: context.drawImage(blockImg.pink, x + offset.x, y + offset.y,1, 1);
+                        break;
+                        
+                    case 5: context.drawImage(blockImg.orange, x + offset.x, y + offset.y,1, 1);
+                        break;
+                        
+                    case 6: context.drawImage(blockImg.yellow, x + offset.x, y + offset.y,1, 1);
+                        break;
+                        
+                    case 7: context.drawImage(blockImg.blue_dark, x + offset.x, y + offset.y,1, 1);
+                        break;
+                    
+                }
+                
+                
+//                "#FF0D72",
+//                "#0DC2FF",
+//                "#0DFF72",
+//                "#F538FF",
+//                "#FF8E0D",
+//                "#FFE138",
+//                "#3877FF",
             }
+                
         });
     });
 }
@@ -164,9 +233,37 @@ function drawMatrix(matrix, offset) {
 function drawMatrix2(matrix, offset) {
     matrix.forEach((row, y) => {
         row.forEach((value, x) => {
+//            if (value !== 0) {
+//                ctx2.fillStyle = colors[value];
+//                ctx2.fillRect(x + 1.6 , y + 1.6, 1, 1);
+//            }
+            
+            
             if (value !== 0) {
-                ctx2.fillStyle = colors[value];
-                ctx2.fillRect(x + 1.6 , y + 1.6, 1, 1);
+                
+                switch (value) {
+                    case 1: ctx2.drawImage(blockImg.red, x + 1.6, y + 1.6 - 0.5, 1, 1);
+                        break;
+                        
+                    case 2: ctx2.drawImage(blockImg.blue_light, x + 1.6 + 0.5, y + 1.6 + 0.4, 1, 1);
+                        break;
+                        
+                    case 3: ctx2.drawImage(blockImg.green, x + 1.6 - 0.5, y + 1.6, 1, 1);
+                        break;
+                        
+                    case 4: ctx2.drawImage(blockImg.pink, x + 1.6 + 0.5, y + 1.6, 1, 1);
+                        break;
+                        
+                    case 5: ctx2.drawImage(blockImg.orange, x + 1.6, y + 1.6 - 0.5, 1, 1);
+                        break;
+                        
+                    case 6: ctx2.drawImage(blockImg.yellow, x + 1.6, y + 1.6 + 0.5, 1, 1);
+                        break;
+                        
+                    case 7: ctx2.drawImage(blockImg.blue_dark, x + 1.6, y + 1.6 + 0.3, 1, 1);
+                        break;
+                    
+                }
             }
         });
     });
@@ -334,16 +431,22 @@ function update(time = 0) {
     const deltaTime = time - lastTime;
     lastTime = time;
     
-    dropCounter += deltaTime;
-    if (dropCounter > dropInterval) {
-        playerDrop();
+    if (gameStarted) {
+        dropCounter += deltaTime;
+        if (dropCounter > dropInterval) {
+            playerDrop();
+        }
+
+        if (cheat) {
+            dropInterval = 1000000000;
+        }   
+
+        draw();
+
+    } else {
+        titleMenu();
     }
     
-    if (cheat) {
-        dropInterval = 1000000000;
-    }   
-    
-    draw();
     requestAnimationFrame(update);
 }
 
@@ -351,6 +454,26 @@ function updateScore() {
     document.getElementById("score").innerText = player.score;
 }
 
+
+function titleMenu() {
+    //title
+    context.drawImage(titleImg, 0, 0, 12 ,20);
+    
+    context.save();
+    context.scale(1,1);
+    context.textAlign = "center";
+    context.font = "1.5px roboto"
+    
+    context.fillStyle = "black";
+    context.fillText("Press Any", 6.1, 13.1);
+    context.fillText("Key To Start", 6.1, 14.6);
+    
+    context.fillStyle = "white";
+    context.fillText("Press Any", 6, 13);
+    context.fillText("Key To Start", 6, 14.5);
+    
+    context.restore();
+}
 
 const colors = [
     null,
@@ -373,23 +496,113 @@ const player = {
     score: 0,
 };
 
-document.addEventListener("keydown", event => {
-   if (event.keyCode == 37) {
-       playerMove(-1);
-   }else if (event.keyCode == 39) {
-       playerMove(1);
-   }else if (event.keyCode == 40) {
-       playerDrop();
-   }else if (event.keyCode == 38) {
-       playerRotate(1);
-   }else if (event.keyCode == 32) {
-        fullDrop();
+var mousekey = false;
+var cheatKey = false;
 
-   }else if (event.keyCode == 16) {
-       if (cheat) {
-           fullDrop();
+var mouseControl = false;
+
+document.addEventListener("keydown", event => {
+
+    if (gameStarted) {
+        if (event.keyCode == 37) {
+           playerMove(-1);
+       }else if (event.keyCode == 39) {
+           playerMove(1);
+       }else if (event.keyCode == 40) {
+           playerDrop();
+       }else if (event.keyCode == 38) {
+           playerRotate(1);
+       }else if (event.keyCode == 32) {
+            fullDrop();
+
+       }else if (event.keyCode == 16) {
+           if (cheat) {
+               fullDrop();
+           }
+
        }
 
+    }
+    
+    if (event.keyCode == 16) {
+        mousekey = true;
+    }
+    
+    gameStarted = true;
+});
+
+
+document.onmousemove = handleMouseMove;
+var MouseX;
+var MouseY;
+var lastMX = 0;
+function handleMouseMove(event) {
+
+	event = event || window.event; // IE-ism
+    
+	//MouseX = event.pageX;
+	//MouseY = event.pageY;
+    
+    var rect = canvas.getBoundingClientRect()
+    
+    var scaleX = canvas.width / rect.width;   
+    var scaleY = canvas.height / rect.height; 
+    
+    //MouseX = event.clientX;
+    MouseX = Math.abs((event.clientX - rect.left) * scaleX);
+    //MouseY = Math.abs((event.clientY - rect.top) * scaleY);
+    
+    
+    if (mouseControl) {
+        
+        if (MouseX > lastMX + 20) {
+            playerMove(1);
+            lastMX = MouseX;
+            
+        } else if (MouseX < lastMX - 20) {
+            playerMove(-1);
+            lastMX = MouseX;
+            
+        }
+    }
+    
+}
+
+document.addEventListener("click", event => {
+   if (mouseControl) {
+       fullDrop();
+   }
+    
+    gameStarted = true;
+    
+});
+
+document.addEventListener("scroll", event => {
+   if (mouseControl) {
+       playerRotate(1);
+   }
+    
+});
+
+
+document.addEventListener("keypress", event => {
+    if (event.keyCode == 77 && mousekey) {
+        mouseControl = !mouseControl;
+    } else if (event.keyCode == 67 && mousekey) {
+        cheat = !cheat;
+    } else if (event.keyCode == 70 && mousekey) {
+        flasher = !flasher;
+    } else if (event.keyCode == 71 && mousekey) {
+        gridEnabled = !gridEnabled;
+    }else if (event.keyCode == 72 && mousekey) {
+        guideEnabled = !guideEnabled;
+    }
+    
+});
+
+document.addEventListener("keyup", event => {
+   if (event.keyCode == 16) {
+       mousekey = false;
    }
     
 });
