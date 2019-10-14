@@ -44,7 +44,8 @@ var scrollOffset = {
 var guns = {
     empty: {r: 0, s: 0, i: 0, d: 0, image: document.getElementById("null")},
     pistol: {r: 40000, s: 20, i: 500, d: 25, image: document.getElementById("pistol")},
-    ak: {r: 40000, s: 20, i: 50, d: 50, image: document.getElementById("ak")},
+    ak: {r: 40000, s: 20, i: 70, d: 40, image: document.getElementById("ak")},
+    shotgun: {r: 40000, s: 20, i: 800, d: 70, image: document.getElementById("shotgun")},
 }
 
 var playerIMG = document.getElementById("player");
@@ -57,8 +58,8 @@ var player = {
     y: 0,
     a: 0,
     image: playerIMG,
-    gun: [guns.pistol, guns.ak, guns.empty, guns.empty, guns.empty],
-    
+    gun: [guns.pistol, guns.ak, guns.shotgun, guns.empty, guns.empty],
+    bulletOffset: 0,
     dir: {
         left: false,
         right: false,
@@ -101,7 +102,7 @@ class particle {
 }
 
 class Enemy {
-    constructor(xPOS, yPOS, size, range, health, C, D) {
+    constructor(xPOS, yPOS, size, range, health, C, D, sped) {
         this.x = xPOS;
         this.y = yPOS;
         this.s = size;
@@ -109,20 +110,23 @@ class Enemy {
         this.h = health;
         this.color = C;
         this.damage = D;
+        this.speed = sped;
     }
 }
 
 class bull {
-    constructor(X, Y, R, S, D) {
+    constructor(X, Y, R, S, D, off) {
+        this.angleOffset = off;
         this.speed = S;
         this.x = X;
         this.y = Y;
-        this.xv = this.speed * Math.cos(player.a - (90 / 180 * Math.PI));
-        this.yv = this.speed * Math.sin(player.a - (90 / 180 * Math.PI));
+        this.xv = this.speed * Math.cos((player.a) - ((player.bulletOffset + 90) / 180 * Math.PI));
+        this.yv = this.speed * Math.sin((player.a) - ((player.bulletOffset + 90) / 180 * Math.PI));
         this.range = R;
         this.count = 0;
         this.damage = D;
     }
+    
 }
 
 var EnemyMoveSpeed = 1;
@@ -133,7 +137,7 @@ var ShootCount = 0;
 
 //ENEMIES SETUP
 for (i = 0; i < 1000; i++) {
-    SpawnEnemy(300, 100, "red", 10);    
+    SpawnEnemy(500, 100, "red", 10, 40);    
 }
 
 var GRIDoffset2X = 0;
@@ -158,29 +162,36 @@ for (i = 0; i < cols; i++) {
     COLSoffset += c.height / cols;
 }
 
-function SpawnEnemy(start, health, col, dam) {
-    var xP = getRandomInt(-2000, 2000);
-    var yP = getRandomInt(-2000, 2000);
+function SpawnEnemy(start, health, col, dam, siz) {
+    var xP = getRandomInt(-1500, 1500);
+    var yP = getRandomInt(-1500, 1500);
     
-    while (!(Math.abs(xP) > start && Math.abs(yP) > start)) {
-        xP = getRandomInt(-2000, 2000);
-        yP = getRandomInt(-2000, 2000);
-        
-        if((Math.abs(xP) > start && Math.abs(yP) > start)) {
-            enemies.push(new Enemy(xP, yP, 30, 500, health, col, dam));
-            return;
-        }
+    if (Math.sign(xP) == -1 && xP > -start + scrollOffset.x) {
+        xP -= start;
     }
+    
+    if (Math.sign(xP) == 1 && xP < start + scrollOffset.x) {
+        xP += start;
+    }
+    
+    if (Math.sign(yP) == -1 && yP > -start + scrollOffset.y) {
+        yP -= start;
+    }
+    
+    if (Math.sign(yP) == 1 && yP < start + scrollOffset.y) {
+        yP += start;
+    }
+    
+    enemies.push(new Enemy(xP, yP, siz, 500, health, col, dam, 1));
 }
 
 function SpawnEnemy2(x, y, health, col, dam, siz) {
-    enemies.push(new Enemy(x, y, siz, 500, health, col, dam));
+    enemies.push(new Enemy(x, y, siz, 500, health, col, dam, 1));
 }
 
 function drawMenu() {
     ctx.fillStyle = "white";
     ctx.fillRect(0,0,c.width,c.height);
-    
     ctx.save();
     ctx.translate(960, 540);
     //grid
@@ -306,11 +317,12 @@ function drawMenu() {
     }
 }
 
+
 function draw() {
     //base
     ctx.fillStyle = "white";      
     ctx.fillRect(0, 0, c.width, c.height);
-    
+
     ctx.save();
     ctx.translate(960, 540);
     //grid
@@ -364,19 +376,20 @@ function draw() {
             
             //bar empty
             ctx.fillStyle = "rgba(200,200,200,0.5)";
-            ctx.fillRect(enemies[i].x - (enemies[i].s / 2) + scrollOffset.x - 10, enemies[i].y - (enemies[i].s / 2) + scrollOffset.y - 15, 
-                         50, 10)
+            ctx.fillRect(enemies[i].x + scrollOffset.x - 25, enemies[i].y - (enemies[i].s / 2) + scrollOffset.y - 15, 50, 10)
             
             //bar color fill
             ctx.fillStyle = "red";
-            ctx.fillRect(enemies[i].x - (enemies[i].s / 2) + scrollOffset.x - 10, enemies[i].y - (enemies[i].s / 2) + scrollOffset.y - 15, 
+            ctx.fillRect(enemies[i].x + scrollOffset.x - 25, enemies[i].y - (enemies[i].s / 2) + scrollOffset.y - 15, 
                          ((enemies[i].h / 1000) * 50), 10);
             
             //bar outline
             ctx.strokeStyle = "rgba(0,0,0,0.8)";
             ctx.lineWidth = "2";
-            ctx.strokeRect(enemies[i].x - (enemies[i].s / 2) + scrollOffset.x - 10, enemies[i].y - (enemies[i].s / 2) + scrollOffset.y - 15, 
+            ctx.strokeRect(enemies[i].x + scrollOffset.x - 25, enemies[i].y - (enemies[i].s / 2) + scrollOffset.y - 15, 
                          50, 10)
+            
+            
         }
     }
     
@@ -445,7 +458,7 @@ function draw() {
     ctx.fillStyle = "black"; 
     ctx.textAlign = "left"; 
     ctx.font = "40px roboto";
-    ctx.fillText("X: " + scrollOffset.x + " Y: " + scrollOffset.y, 20, 320);
+    ctx.fillText("X: " + -scrollOffset.x + " Y: " + scrollOffset.y, 20, 320);
     
     //gun rack display
     ctx.fillStyle = "rgba(200,200,200,0.5)";
@@ -503,6 +516,10 @@ function draw() {
     //DRAW PISTOL IN BAR
     DrawGunInRack(guns.pistol);
     DrawGunInRack(guns.ak);
+    DrawGunInRack(guns.shotgun);
+    
+    
+    
     
     //PAUSE OVERLAY MUST BE AT BOTTOM
     if (gamePause) {
@@ -557,6 +574,7 @@ function draw() {
         ctx.fillText(menu.buttons.gameBack.text.string, menu.buttons.gameBack.text.x, menu.buttons.gameBack.text.y);
 
     }
+
 }
 
 function drawGun(x, y, g) {
@@ -566,6 +584,10 @@ function drawGun(x, y, g) {
             break;
         
         case guns.ak: 
+            ctx.drawImage(g.image, x,y, 70, 70);
+            break;
+        
+        case guns.shotgun: 
             ctx.drawImage(g.image, x,y, 70, 70);
             break;
     }
@@ -658,13 +680,14 @@ function playerMove() {
                 
     }
     
-    
+    //no health game over
     if (player.health <= 0) {
         EnemyMoveSpeed = 0;
         player.health = 0;
         gameOver = true;
     }
     
+    //damaged color
     if (!player.canDamage) {
         player.gracePeriodCount += 1;
         
@@ -683,16 +706,17 @@ function playerMove() {
         }
     }
     
+    //reset bar color when not damaged
     if (!player.canDamage && player.gracePeriodCount > 70) {
         player.gracePeriodCount = 0;
         player.canDamage = true;
         barColor = "lime";
     }
     
-    
+    //testing spawn enemies
     if (score > 100 && s1) {
         for (i = 0; i< 2000; i++) {
-            SpawnEnemy(300, 100, "red", 10);
+            SpawnEnemy(200, 100, "lightred", 10, 40);
             
         }
         s1 = false
@@ -700,11 +724,20 @@ function playerMove() {
     if (score > 500 && s2) {
         
         for (i = 0; i< 1000; i++) {
-            SpawnEnemy(400, 500, "green", 20);
+            SpawnEnemy(200, 500, "darkgreen", 20, 60);
         }
         s2 = false
     }
+    if (score > 1000 && s3) {
+        
+        for (i = 0; i< 500; i++) {
+            SpawnEnemy(200, 500, "deepblue", 40, 100);
+        }
+        s2 = false
+    }
+    ////////
     
+    //increase health when not injured
     if (player.health < 100 && player.canDamage && player.healCount > player.healTime) {
         player.health += player.healIncrement;
     }
@@ -721,30 +754,30 @@ function EnemyMove() {
            enemies[i].y + scrollOffset.y < player.y + enemies[i].r && enemies[i].y + scrollOffset.y > player.y - enemies[i].r) {
             //right
             if (enemies[i].x + scrollOffset.x < player.x) {
-                enemies[i].x += EnemyMoveSpeed;
+                enemies[i].x += enemies[i].speed;
             }
             
             //left
             if (enemies[i].x + scrollOffset.x > player.x) {
-                enemies[i].x -= EnemyMoveSpeed;
+                enemies[i].x -= enemies[i].speed;
             }
             
             //down
             if (enemies[i].y + scrollOffset.y < player.y) {
-                enemies[i].y += EnemyMoveSpeed;
+                enemies[i].y += enemies[i].speed;
             }
             
             //up
             if (enemies[i].y + scrollOffset.y > player.y) {
-                enemies[i].y -= EnemyMoveSpeed;
+                enemies[i].y -= enemies[i].speed;
             }
             
             //ANTI ENEMY CLUMP
             for (e = 0; e < enemies.length; e++) {
-                if (enemies[i].x + scrollOffset.x - enemies[i].s < enemies[e].x + enemies[e].s + scrollOffset.x && 
-                    enemies[i].x + scrollOffset.x + enemies[i].s > enemies[e].x - enemies[e].s + scrollOffset.x &&
-                    enemies[i].y + scrollOffset.y - enemies[i].s < enemies[e].y + enemies[e].s + scrollOffset.y &&
-                    enemies[i].y + scrollOffset.y + enemies[i].s > enemies[e].y - enemies[e].s + scrollOffset.y) {
+                if (enemies[i].x + scrollOffset.x - (enemies[i].s / 2) < enemies[e].x + (enemies[e].s / 2) + scrollOffset.x && 
+                    enemies[i].x + scrollOffset.x + (enemies[i].s / 2) > enemies[e].x - (enemies[e].s / 2) + scrollOffset.x &&
+                    enemies[i].y + scrollOffset.y - (enemies[i].s / 2) < enemies[e].y + (enemies[e].s / 2) + scrollOffset.y &&
+                    enemies[i].y + scrollOffset.y + (enemies[i].s / 2) > enemies[e].y - (enemies[e].s / 2) + scrollOffset.y) {
                     //right
                     if (enemies[i].x + scrollOffset.x < enemies[e].x + scrollOffset.x) {
                         enemies[i].x -= 1;
@@ -818,10 +851,10 @@ function bulletMove() {
      
         //bullet enemy collision
         for (e = 0; e < enemies.length; e++) {
-            if (player.bullets[i].x < enemies[e].x + enemies[e].s && player.bullets[i].x > enemies[e].x - enemies[e].s &&
-               player.bullets[i].y < enemies[e].y + enemies[e].s && player.bullets[i].y > enemies[e].y - enemies[e].s) {
-                KillEnemy(i, e, enemies[e].x, enemies[e].y)
-                SpawnEnemy(300, 100, "red", 10);
+            if (player.bullets[i].x - 5 < enemies[e].x + (enemies[e].s / 2) && player.bullets[i].x + 5 > enemies[e].x - (enemies[e].s / 2) &&
+               player.bullets[i].y - 5 < enemies[e].y + (enemies[e].s / 2) && player.bullets[i].y + 5 > enemies[e].y - (enemies[e].s / 2)) {
+                KillEnemy(i, e, enemies[e].x, enemies[e].y);
+                SpawnEnemy(200, 100, "red", 10, 40);
                 break;
             }
             
@@ -868,7 +901,24 @@ function KillEnemy(bullet, enemy, ex, ey) {
 
 function Shoot() {
     player.image = playerShootIMG;
-    player.bullets.push(new bull(-scrollOffset.x, -scrollOffset.y, player.gun[player.gunSelection].r, player.gun[player.gunSelection].s));
+
+    if (player.gun[player.gunSelection] == guns.pistol) {
+        player.bulletOffset = 0;
+        player.bullets.push(new bull(-scrollOffset.x, -scrollOffset.y, player.gun[player.gunSelection].r, player.gun[player.gunSelection].s));
+        
+    }else if (player.gun[player.gunSelection] == guns.ak) {
+        player.bulletOffset = genRand(-10, 10, 2);
+        player.bullets.push(new bull(-scrollOffset.x, -scrollOffset.y, player.gun[player.gunSelection].r, player.gun[player.gunSelection].s));
+        
+    }else if (player.gun[player.gunSelection] == guns.shotgun) {
+        player.bulletOffset = 25;
+        player.bullets.push(new bull(-scrollOffset.x, -scrollOffset.y, player.gun[player.gunSelection].r, player.gun[player.gunSelection].s));
+        player.bulletOffset = 0;
+        player.bullets.push(new bull(-scrollOffset.x, -scrollOffset.y, player.gun[player.gunSelection].r, player.gun[player.gunSelection].s));
+        player.bulletOffset = -25;
+        player.bullets.push(new bull(-scrollOffset.x, -scrollOffset.y, player.gun[player.gunSelection].r, player.gun[player.gunSelection].s));
+                   
+    }
 }
 
 function update(time = 0) {
@@ -1070,9 +1120,17 @@ document.addEventListener("keydown", event => {
             }
         }
 
+        if (gamePause)  {
+            player.dir.up = false;
+            player.dir.down = false;
+            player.dir.left = false;
+            player.dir.right = false;
+        }
+        
         if ((event.keyCode == 80 || event.keyCode == 27) && !gameOver) {
             gamePause = !gamePause;
         }
+        
     }
 });
 
@@ -1143,6 +1201,12 @@ function getRandomInt(min, max) {
     min = Math.ceil(min);
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function genRand(min, max, decimalPlaces) {  
+    var rand = Math.random()*(max-min) + min;
+    var power = Math.pow(10, decimalPlaces);
+    return Math.floor(rand*power) / power;
 }
 
 update();
