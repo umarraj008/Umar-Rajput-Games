@@ -4,28 +4,60 @@ ctx.scale(1,1);
 let lastTime = 0;
 var dt;
 
+var displayMenu = true;
+var howToPlay = false;
 
 //testing
 var s1 = true;
 var s2 = true;
 
+var menu = {
+    buttons: {
+        play: {x: c.width / 2 - 565, y: c.height / 2 - 100 + 50, w: 350, h: 200, over: false, 
+               color: "rgba(10,10,10,0.5)", highlight: "rgba(0,0,0,0.7)", 
+               text: {string: "Play", x: c.width / 2 - 390, y: c.height / 2 + 15 + 50, color: "white", size: "50px roboto"}},
+        
+        quit: {x: c.width / 2 - 175, y: c.height / 2 - 100 + 50, w: 350, h: 200, over: false, 
+               color: "rgba(10,10,10,0.5)", highlight: "rgba(0,0,0,0.7)", 
+               text: {string: "Quit", x: c.width / 2, y: c.height / 2 + 15 + 50, color: "white", size: "50px roboto"}},
+        
+        HTP: {x: c.width / 2 + 215, y: c.height / 2 - 100 + 50, w: 350, h: 200, over: false, 
+              color: "rgba(10,10,10,0.5)", highlight: "rgba(0,0,0,0.7)", 
+              text: {string: "How to Play", x: c.width / 2 + 390, y: c.height / 2 + 15 + 50, color: "white", size: "50px roboto"}},
+        
+        back: {x: c.width / 2 - 175, y: c.height / 2 + 300, w: 350, h: 200, over: false, 
+               color: "rgba(10,10,10,0.5)", highlight: "rgba(0,0,0,0.7)", 
+               text: {string: "Back", x: c.width / 2, y: c.height / 2 + 410, color: "white", size: "50px roboto"}},
+        
+        gameBack: {x: c.width / 2 - 175, y: c.height / 2 + 300 - 200, w: 350, h: 200, over: false, 
+               color: "rgba(10,10,10,0.5)", highlight: "rgba(0,0,0,0.7)", 
+               text: {string: "Back to Menu", x: c.width / 2, y: c.height / 2 + 410 - 200, color: "white", size: "50px roboto"}},
+    },
+}
 
 var scrollOffset = {
     x: 0,
     y: 0,
 }
 
+// RANGE SPEED INCREMENT/per DAMAGE IMAGE
 var guns = {
-    pistol: {r: 20000, s: 20, i: 500, d: 25},
-    ak: {r: 20000, s: 20, i: 50, d: 100},
+    empty: {r: 0, s: 0, i: 0, d: 0, image: document.getElementById("null")},
+    pistol: {r: 40000, s: 20, i: 500, d: 25, image: document.getElementById("pistol")},
+    ak: {r: 40000, s: 20, i: 50, d: 50, image: document.getElementById("ak")},
 }
+
+var playerIMG = document.getElementById("player");
+var playerShootIMG = document.getElementById("shoot");
+var playerDamageImg = document.getElementById("damage");
+var howToPlayIMG = document.getElementById("HTP");
 
 var player = {
     x: 0,
     y: 0,
     a: 0,
-    image: null,
-    gun: guns.pistol,
+    image: playerIMG,
+    gun: [guns.pistol, guns.ak, guns.empty, guns.empty, guns.empty],
     
     dir: {
         left: false,
@@ -33,18 +65,17 @@ var player = {
         up: false,
         down: false,
     },
-    
+    gunSelection: 0,
     bullets: [],
     shoot: false,
     canShoot: true,
     health: 100,
     canDamage: true,
     gracePeriodCount: 0,
+    healCount: 0,
+    healTime: 300,
+    healIncrement: 0.02,
 }
-
-var playerIMG = document.getElementById("player");
-var playerShootIMG = document.getElementById("shoot");
-var playerDamageImg = document.getElementById("damage");
 
 var enemies = [];
 var gridRows = [];
@@ -53,6 +84,7 @@ var gridCols = [];
 var score = 0;
 var gameOver = false;
 var barColor = "lime";
+var gamePause = false;
 
 var EnemyParticles = [];
 var particleSpots = [];
@@ -104,6 +136,10 @@ for (i = 0; i < 1000; i++) {
     SpawnEnemy(300, 100, "red", 10);    
 }
 
+var GRIDoffset2X = 0;
+var GRIDoffset2Y = 0;
+
+
 var ROWoffset = 0;
 var COLSoffset = 0;
 var rows = 20;
@@ -141,14 +177,138 @@ function SpawnEnemy2(x, y, health, col, dam, siz) {
     enemies.push(new Enemy(x, y, siz, 500, health, col, dam));
 }
 
+function drawMenu() {
+    ctx.fillStyle = "white";
+    ctx.fillRect(0,0,c.width,c.height);
+    
+    ctx.save();
+    ctx.translate(960, 540);
+    //grid
+    for (i = 0; i < gridRows.length; i++) {
+        ctx.fillStyle = "grey";
+        ctx.fillRect(gridRows[i].x - 2 + GRIDoffset2X, -c.height / 2, 4, c.height);
+    }
+    
+    for (i = 0; i < gridCols.length; i++) {
+        ctx.fillStyle = "grey";
+        ctx.fillRect(-c.width / 2, gridCols[i].y - 2 + GRIDoffset2Y, c.width, 4);
+    }
+    ctx.restore();
+    
+    if (!howToPlay) {
+        //TITLE
+        ctx.fillStyle = "rgb(20, 0, 0)"; 
+        ctx.font = "200px roboto";
+        ctx.textAlign = "center";
+        ctx.fillText("Shooter", c.width / 2, c.height / 2 - 200 + 90);
+
+        //WARNING
+        ctx.fillStyle = "rgb(255, 0, 0)"; 
+        ctx.font = "40px roboto";
+        ctx.textAlign = "center";
+        ctx.fillText("Game is Still in Development", c.width / 2, c.height / 2 - 200 + 390);
+        
+        //PLAY BUTTON
+        if (menu.buttons.play.over) {
+            ctx.fillStyle = menu.buttons.play.highlight;
+            ctx.fillRect(menu.buttons.play.x, menu.buttons.play.y, menu.buttons.play.w, menu.buttons.play.h);
+
+        } else {
+            ctx.fillStyle = menu.buttons.play.color;
+            ctx.fillRect(menu.buttons.play.x, menu.buttons.play.y, menu.buttons.play.w, menu.buttons.play.h);
+        }
+
+        ctx.fillStyle = menu.buttons.play.text.color; 
+        ctx.font = menu.buttons.play.text.size;
+        ctx.textAlign = "center";
+        ctx.fillText(menu.buttons.play.text.string, menu.buttons.play.text.x, menu.buttons.play.text.y);
+
+        //QUIT BUTTON
+        if (menu.buttons.quit.over) {
+            ctx.fillStyle = menu.buttons.quit.highlight;
+            ctx.fillRect(menu.buttons.quit.x, menu.buttons.quit.y, menu.buttons.quit.w, menu.buttons.quit.h);
+
+        } else {
+            ctx.fillStyle = menu.buttons.quit.color;
+            ctx.fillRect(menu.buttons.quit.x, menu.buttons.quit.y, menu.buttons.quit.w, menu.buttons.quit.h);
+        }
+
+        ctx.fillStyle = menu.buttons.quit.text.color; 
+        ctx.font = menu.buttons.quit.text.size;
+        ctx.textAlign = "center";
+        ctx.fillText(menu.buttons.quit.text.string, menu.buttons.quit.text.x, menu.buttons.quit.text.y);
+
+        //HOW TO PLAY BUTTON
+        if (menu.buttons.HTP.over) {
+            ctx.fillStyle = menu.buttons.HTP.highlight;
+            ctx.fillRect(menu.buttons.HTP.x, menu.buttons.HTP.y, menu.buttons.HTP.w, menu.buttons.HTP.h);
+
+        } else {
+            ctx.fillStyle = menu.buttons.HTP.color;
+            ctx.fillRect(menu.buttons.HTP.x, menu.buttons.HTP.y, menu.buttons.HTP.w, menu.buttons.HTP.h);
+        }
+
+        ctx.fillStyle = menu.buttons.HTP.text.color; 
+        ctx.font = menu.buttons.HTP.text.size;
+        ctx.textAlign = "center";
+        ctx.fillText(menu.buttons.HTP.text.string, menu.buttons.HTP.text.x, menu.buttons.HTP.text.y);
+    } else { //HOW TO PLAY
+        //TITLE
+        ctx.fillStyle = "rgb(20, 0, 0)"; 
+        ctx.font = "160px roboto";
+        ctx.textAlign = "center";
+        ctx.fillText("How to Play", c.width / 2, c.height / 2 - 370);
+
+        //BACK BUTTON
+
+        if (menu.buttons.back.over) {
+            ctx.fillStyle = menu.buttons.back.highlight;
+            ctx.fillRect(menu.buttons.back.x, menu.buttons.back.y, menu.buttons.back.w, menu.buttons.back.h);
+
+        } else {
+            ctx.fillStyle = menu.buttons.back.color;
+            ctx.fillRect(menu.buttons.back.x, menu.buttons.back.y, menu.buttons.back.w, menu.buttons.back.h);
+        }
+        
+        ctx.fillStyle = menu.buttons.back.text.color; 
+        ctx.font = menu.buttons.back.text.size;
+        ctx.textAlign = "center";
+        ctx.fillText(menu.buttons.back.text.string, menu.buttons.back.text.x, menu.buttons.back.text.y);
+        
+        
+        //image
+        ctx.drawImage(howToPlayIMG, 50,220);
+    }
+    
+    GRIDoffset2X -= 1;
+    GRIDoffset2Y -= 1;
+    
+    for(i = 0; i < gridRows.length; i++) {
+        if (gridRows[i].x + GRIDoffset2X <= -c.width / 2) {
+            GRIDoffset2X += c.width / rows;
+        }
+        
+        if (gridRows[i].x + GRIDoffset2X >= c.width / 2) {
+            GRIDoffset2X -= c.width / rows;
+        }
+                
+    }
+    
+    for(i = 0; i < gridCols.length; i++) {
+        if (gridCols[i].y + GRIDoffset2Y <= -c.height / 2) {
+            GRIDoffset2Y += c.height / cols;
+        }
+        
+        if (gridCols[i].y + GRIDoffset2Y >= c.height / 2) {
+            GRIDoffset2Y -= c.height / cols;
+        }
+                
+    }
+}
+
 function draw() {
     //base
-    if (!gameOver) {
-        ctx.fillStyle = "white";
-
-    } else {
-        ctx.fillStyle = "red";        
-    }
+    ctx.fillStyle = "white";      
     ctx.fillRect(0, 0, c.width, c.height);
     
     ctx.save();
@@ -277,13 +437,160 @@ function draw() {
     
     //score text
     ctx.fillStyle = "black";
+    ctx.textAlign = "right";
     ctx.font = "40px roboto";
-    ctx.fillText("Score: " + score, c.width - 200,60);
+    ctx.fillText("Kills: " + score, c.width - 20,60);
     
-    //location
-    ctx.fillStyle = "black";
+    //location COORDS
+    ctx.fillStyle = "black"; 
+    ctx.textAlign = "left"; 
     ctx.font = "40px roboto";
     ctx.fillText("X: " + scrollOffset.x + " Y: " + scrollOffset.y, 20, 320);
+    
+    //gun rack display
+    ctx.fillStyle = "rgba(200,200,200,0.5)";
+    ctx.fillRect(20 ,c.height / 2 - 15 + 440 ,420,90);
+    
+    //outline //76
+    ctx.strokeStyle = "rgba(0,0,0,0.8)";
+    ctx.lineWidth = "4";
+    ctx.strokeRect(20 ,c.height / 2 - 15 + 440 ,420,90);
+    
+    ctx.strokeStyle = "rgba(0,0,0,0.8)";
+    ctx.lineWidth = "4";
+    ctx.beginPath();
+    ctx.moveTo(20 + 84, c.height / 2 - 15 + 440);
+    ctx.lineTo(20 + 84,c.height / 2 - 15 + 530);
+    ctx.stroke();
+    
+    ctx.beginPath();
+    ctx.moveTo(20 + 84 * 2, c.height / 2 - 15 + 440);
+    ctx.lineTo(20 + 84 * 2,c.height / 2 - 15 + 530);
+    ctx.stroke();
+    
+    ctx.beginPath();
+    ctx.moveTo(20 + 84 * 3, c.height / 2 - 15 + 440);
+    ctx.lineTo(20 + 84 * 3,c.height / 2 - 15 + 530);
+    ctx.stroke();
+    
+    ctx.beginPath();
+    ctx.moveTo(20 + 84 * 4, c.height / 2 - 15 + 440);
+    ctx.lineTo(20 + 84 * 4,c.height / 2 - 15 + 530);
+    ctx.stroke();
+    
+    //BAR SELECTION HIGHLIGHT
+    if(player.gunSelection == 0) {
+        ctx.fillStyle = "rgba(33,214,255,0.5)";
+        ctx.fillRect(20,c.height / 2 - 15 + 440 ,84,90);
+        
+    }else if(player.gunSelection == 1) {
+        ctx.fillStyle = "rgba(33,214,255,0.5)";
+        ctx.fillRect(104,c.height / 2 - 15 + 440 ,84,90);
+        
+    }else if(player.gunSelection == 2) {
+        ctx.fillStyle = "rgba(33,214,255,0.5)";
+        ctx.fillRect(188,c.height / 2 - 15 + 440 ,84,90);
+        
+    }else if(player.gunSelection == 3) {
+        ctx.fillStyle = "rgba(33,214,255,0.5)";
+        ctx.fillRect(272,c.height / 2 - 15 + 440 ,84,90);
+        
+    }else if(player.gunSelection == 4) {
+        ctx.fillStyle = "rgba(33,214,255,0.5)";
+        ctx.fillRect(356,c.height / 2 - 15 + 440 ,84,90);
+    }
+    
+    //DRAW PISTOL IN BAR
+    DrawGunInRack(guns.pistol);
+    DrawGunInRack(guns.ak);
+    
+    //PAUSE OVERLAY MUST BE AT BOTTOM
+    if (gamePause) {
+        ctx.fillStyle = "rgba(200,200,200,0.7)";
+        ctx.fillRect(0 ,0, c.width, c.height)
+
+        ctx.fillStyle = "black"; 
+        ctx.font = "80px roboto";
+        ctx.textAlign = "center";
+        ctx.fillText("PAUSED", c.width / 2, c.height / 2 + 30);
+        
+        //BACK BUTTON
+        if (menu.buttons.gameBack.over) {
+            ctx.fillStyle = menu.buttons.gameBack.highlight;
+            ctx.fillRect(menu.buttons.gameBack.x, menu.buttons.gameBack.y, menu.buttons.gameBack.w, menu.buttons.gameBack.h);
+
+        } else {
+            ctx.fillStyle = menu.buttons.gameBack.color;
+            ctx.fillRect(menu.buttons.gameBack.x, menu.buttons.gameBack.y, menu.buttons.gameBack.w, menu.buttons.gameBack.h);
+        }
+        
+        ctx.fillStyle = menu.buttons.gameBack.text.color; 
+        ctx.font = menu.buttons.gameBack.text.size;
+        ctx.textAlign = "center";
+        ctx.fillText(menu.buttons.gameBack.text.string, menu.buttons.gameBack.text.x, menu.buttons.gameBack.text.y);
+
+    }
+    
+    //GAMEOVER OVERLAY MUST BE AT BOTTOM
+    if (gameOver) {
+        ctx.fillStyle = "rgba(255,0,0,0.5)";
+        ctx.fillRect(0 ,0, c.width, c.height)
+
+        ctx.fillStyle = "rgb(20, 0, 0)"; 
+        ctx.font = "160px roboto";
+        ctx.textAlign = "center";
+        ctx.fillText("GAME OVER", c.width / 2, c.height / 2 + 40);
+        
+        //BACK BUTTON
+        if (menu.buttons.gameBack.over) {
+            ctx.fillStyle = menu.buttons.gameBack.highlight;
+            ctx.fillRect(menu.buttons.gameBack.x, menu.buttons.gameBack.y, menu.buttons.gameBack.w, menu.buttons.gameBack.h);
+
+        } else {
+            ctx.fillStyle = menu.buttons.gameBack.color;
+            ctx.fillRect(menu.buttons.gameBack.x, menu.buttons.gameBack.y, menu.buttons.gameBack.w, menu.buttons.gameBack.h);
+        }
+        
+        ctx.fillStyle = menu.buttons.gameBack.text.color; 
+        ctx.font = menu.buttons.gameBack.text.size;
+        ctx.textAlign = "center";
+        ctx.fillText(menu.buttons.gameBack.text.string, menu.buttons.gameBack.text.x, menu.buttons.gameBack.text.y);
+
+    }
+}
+
+function drawGun(x, y, g) {
+    switch(g){
+        case guns.pistol: 
+            ctx.drawImage(g.image, x,y, 70, 70);
+            break;
+        
+        case guns.ak: 
+            ctx.drawImage(g.image, x,y, 70, 70);
+            break;
+    }
+}
+
+function DrawGunInRack(g) {
+    if (player.gun[0]== g) {
+        drawGun(20 + 7, c.height / 2 - 15 + 448, g)
+    } 
+    
+    if (player.gun[1] == g) {
+        drawGun(104 + 7, c.height / 2 - 15 + 448, g)
+    } 
+    
+    if (player.gun[2] == g) {
+        drawGun(188 + 7, c.height / 2 - 15 + 448, g)
+    } 
+    
+    if (player.gun[3] == g) {
+        drawGun(272 + 7, c.height / 2 - 15 + 448, g)
+    } 
+    
+    if (player.gun[4] == g) {
+        drawGun(356 + 7, c.height / 2 - 15 + 448, g)
+    } 
 }
 
 var f = 90 / 180 * Math.PI;
@@ -313,7 +620,7 @@ function playerMove() {
     
     ShootCount += dt;
     
-    if (ShootCount > player.gun.i) {
+    if (ShootCount > player.gun[player.gunSelection].i) {
         player.canShoot = true;
     } else {
         player.canShoot = false;
@@ -397,6 +704,12 @@ function playerMove() {
         }
         s2 = false
     }
+    
+    if (player.health < 100 && player.canDamage && player.healCount > player.healTime) {
+        player.health += player.healIncrement;
+    }
+    
+    player.healCount += 1;
     
 }
 
@@ -493,6 +806,7 @@ function DamagePlayer(amount) {
         player.health -= amount;
         barColor = "red";
         player.canDamage = false;
+        player.healCount = 0;
     }
 }
 
@@ -534,7 +848,7 @@ function bulletMove() {
 function KillEnemy(bullet, enemy, ex, ey) {
     player.bullets.splice(bullet,1);
     
-    enemies[enemy].h -= player.gun.d;
+    enemies[enemy].h -= player.gun[player.gunSelection].d;
     if (enemies[enemy].h <= 0) {
         var parts = [
             new particle(ex, ey, 5, "red", 50),
@@ -554,19 +868,25 @@ function KillEnemy(bullet, enemy, ex, ey) {
 
 function Shoot() {
     player.image = playerShootIMG;
-    player.bullets.push(new bull(-scrollOffset.x, -scrollOffset.y, player.gun.r, player.gun.s));
+    player.bullets.push(new bull(-scrollOffset.x, -scrollOffset.y, player.gun[player.gunSelection].r, player.gun[player.gunSelection].s));
 }
 
 function update(time = 0) {
     dt = time - lastTime;
     lastTime = time;
-    if (!gameOver) {
-        particlesAnim();
-        EnemyMove();
-        playerMove();
-        bulletMove();
+    if (!displayMenu) {
+        if (!gamePause) {
+            if (!gameOver) {
+                particlesAnim();
+                EnemyMove();
+                playerMove();
+                bulletMove();
+            }
+        }
+        draw();
+    } else {
+        drawMenu();
     }
-    draw();
     requestAnimationFrame(update);
 }
 
@@ -659,65 +979,152 @@ function handleMouseMove(event) {
     }
     
     //player.a = player.a * 180 / Math.PI
+    
+    //MENU BUTTON HIGHLIGHT
+    if (displayMenu) {
+        if (MouseX <= (menu.buttons.play.x + menu.buttons.play.w) && MouseX >= menu.buttons.play.x &&
+            MouseY <= (menu.buttons.play.y + menu.buttons.play.h) && MouseY >= menu.buttons.play.y) {
+            menu.buttons.play.over = true;
+        } else {
+            menu.buttons.play.over = false;
+        }
+        
+        if (MouseX <= (menu.buttons.quit.x + menu.buttons.quit.w) && MouseX >= menu.buttons.quit.x &&
+            MouseY <= (menu.buttons.quit.y + menu.buttons.quit.h) && MouseY >= menu.buttons.quit.y) {
+            menu.buttons.quit.over = true;
+        } else {
+            menu.buttons.quit.over = false;
+        }
+        
+        if (MouseX <= (menu.buttons.HTP.x + menu.buttons.HTP.w) && MouseX >= menu.buttons.HTP.x &&
+            MouseY <= (menu.buttons.HTP.y + menu.buttons.HTP.h) && MouseY >= menu.buttons.HTP.y) {
+            menu.buttons.HTP.over = true;
+        } else {
+            menu.buttons.HTP.over = false;
+        }
+        
+        if (MouseX <= (menu.buttons.back.x + menu.buttons.back.w) && MouseX >= menu.buttons.back.x &&
+            MouseY <= (menu.buttons.back.y + menu.buttons.back.h) && MouseY >= menu.buttons.back.y) {
+            menu.buttons.back.over = true;
+        } else {
+            menu.buttons.back.over = false;
+        }
+        
+    }
+    
+    if (gamePause || gameOver) {
+        if (MouseX <= (menu.buttons.gameBack.x + menu.buttons.gameBack.w) && MouseX >= menu.buttons.gameBack.x &&
+            MouseY <= (menu.buttons.gameBack.y + menu.buttons.gameBack.h) && MouseY >= menu.buttons.gameBack.y) {
+            menu.buttons.gameBack.over = true;
+        } else {
+            menu.buttons.gameBack.over = false;
+        }
+    }
+    
 }
 
 //INPUT
 document.addEventListener("keydown", event => {
-    
-    if (event.keyCode == 37 || event.keyCode == 65) {
-        //LEFT
-        player.dir.left = true;
-    }else if (event.keyCode == 39 || event.keyCode == 68) {
-        //RIGHT
-        player.dir.right = true;
-    } else if (event.keyCode == 38 || event.keyCode == 87) {
-        //UP
-        player.dir.up = true;
-    }else if (event.keyCode == 40 || event.keyCode == 83) {
-        //DOWN
-        player.dir.down = true;
-    }else if (event.keyCode == 32 && player.canShoot) {
-        //SPACE
-        player.shoot = true;
-        player.image = playerShootIMG;
-    }else if (event.keyCode == 49) {
-        player.gun = guns.pistol;
-    }else if (event.keyCode == 50) {
-        player.gun = guns.ak;
-    }else if (event.keyCode == 51) {
-        player.gun = guns.pistol;
-    }else if (event.keyCode == 52) {
-        player.gun = guns.pistol;
+    if (!displayMenu) {
+        if (!gamePause) {
+            if (!gameOver) {
+                if (event.keyCode == 37 || event.keyCode == 65) {
+                    //LEFT
+                    player.dir.left = true;
+                }else if (event.keyCode == 39 || event.keyCode == 68) {
+                    //RIGHT
+                    player.dir.right = true;
+                } else if (event.keyCode == 38 || event.keyCode == 87) {
+                    //UP
+                    player.dir.up = true;
+                }else if (event.keyCode == 40 || event.keyCode == 83) {
+                    //DOWN
+                    player.dir.down = true;
+                }else if (event.keyCode == 32 && player.canShoot) {
+                    //SPACE
+                    player.shoot = true;
+                    player.image = playerShootIMG;
+                }else if (event.keyCode == 49) {
+                    player.gunSelection = 0;
+                }else if (event.keyCode == 50) {
+                    player.gunSelection = 1;
+                }else if (event.keyCode == 51) {
+                    player.gunSelection = 2;
+                }else if (event.keyCode == 52) {
+                    player.gunSelection = 3;
+                }else if (event.keyCode == 53) {
+                    player.gunSelection = 4;
+                } 
+            }
+        }
+
+        if ((event.keyCode == 80 || event.keyCode == 27) && !gameOver) {
+            gamePause = !gamePause;
+        }
     }
-   
-    
 });
 
 document.addEventListener("keyup", event => {
-   
-    if (event.keyCode == 37 || event.keyCode == 65) {
-        //LEFT
-        player.dir.left = false;
-    }else if (event.keyCode == 39 || event.keyCode == 68) {
-        //RIGHT
-        player.dir.right = false;
-    } else if (event.keyCode == 38 || event.keyCode == 87) {
-        //UP
-        player.dir.up = false;
-    }else if (event.keyCode == 40 || event.keyCode == 83) {
-        //DOWN
-        player.dir.down = false;
-    }else if (event.keyCode == 32) {
-        //SPACE
-        player.shoot = false;
-        player.canShoot = true;
+    if (!displayMenu) {
+        if (!gamePause) {
+            if (!gameOver) {
+                if (event.keyCode == 37 || event.keyCode == 65) {
+                    //LEFT
+                    player.dir.left = false;
+                }else if (event.keyCode == 39 || event.keyCode == 68) {
+                    //RIGHT
+                    player.dir.right = false;
+                } else if (event.keyCode == 38 || event.keyCode == 87) {
+                    //UP
+                    player.dir.up = false;
+                }else if (event.keyCode == 40 || event.keyCode == 83) {
+                    //DOWN
+                    player.dir.down = false;
+                }else if (event.keyCode == 32) {
+                    //SPACE
+                    player.shoot = false;
+                    player.canShoot = true;
+                }
+            }
+        }
     }
 });
 
 document.addEventListener("click", event => {
-    if (player.canShoot) {
-        Shoot();
-        player.image = playerShootIMG;
+    if (!displayMenu) {
+        if (!gamePause) {
+            if (!gameOver) {
+                if (player.canShoot) {
+                    Shoot();
+                    player.image = playerShootIMG;
+                }
+            } else {
+                if (MouseX <= (menu.buttons.gameBack.x + menu.buttons.gameBack.w) && MouseX >= menu.buttons.gameBack.x &&
+                    MouseY <= (menu.buttons.gameBack.y + menu.buttons.gameBack.h) && MouseY >= menu.buttons.gameBack.y) {
+                    location.reload();
+                }
+            }
+        } else {
+            if (MouseX <= (menu.buttons.gameBack.x + menu.buttons.gameBack.w) && MouseX >= menu.buttons.gameBack.x &&
+                MouseY <= (menu.buttons.gameBack.y + menu.buttons.gameBack.h) && MouseY >= menu.buttons.gameBack.y) {
+                location.reload();
+            }
+        }
+    } else {
+        if (MouseX <= (menu.buttons.play.x + menu.buttons.play.w) && MouseX >= menu.buttons.play.x &&
+            MouseY <= (menu.buttons.play.y + menu.buttons.play.h) && MouseY >= menu.buttons.play.y) {
+            displayMenu = false;
+        }else if (MouseX <= (menu.buttons.quit.x + menu.buttons.quit.w) && MouseX >= menu.buttons.quit.x &&
+            MouseY <= (menu.buttons.quit.y + menu.buttons.quit.h) && MouseY >= menu.buttons.quit.y) {
+            location.href = "../index.html";
+        }else if (MouseX <= (menu.buttons.HTP.x + menu.buttons.HTP.w) && MouseX >= menu.buttons.HTP.x &&
+            MouseY <= (menu.buttons.HTP.y + menu.buttons.HTP.h) && MouseY >= menu.buttons.HTP.y) {
+            howToPlay = true;
+        }else if (MouseX <= (menu.buttons.back.x + menu.buttons.back.w) && MouseX >= menu.buttons.back.x &&
+            MouseY <= (menu.buttons.back.y + menu.buttons.back.h) && MouseY >= menu.buttons.back.y) {
+            howToPlay = false;
+        }
+        
     }
     
     //console.log((player.a) * 180 / Math.PI, (player.a / 180 * Math.PI) * 180 / Math.PI);
