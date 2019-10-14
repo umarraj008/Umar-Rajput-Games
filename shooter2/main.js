@@ -10,6 +10,7 @@ var howToPlay = false;
 //testing
 var s1 = true;
 var s2 = true;
+var s3 = true;
 
 var menu = {
     buttons: {
@@ -137,7 +138,7 @@ var ShootCount = 0;
 
 //ENEMIES SETUP
 for (i = 0; i < 1000; i++) {
-    SpawnEnemy(500, 100, "red", 10, 40);    
+    SpawnEnemy(300, 100, "red", 10, 40);    
 }
 
 var GRIDoffset2X = 0;
@@ -163,26 +164,18 @@ for (i = 0; i < cols; i++) {
 }
 
 function SpawnEnemy(start, health, col, dam, siz) {
-    var xP = getRandomInt(-1500, 1500);
-    var yP = getRandomInt(-1500, 1500);
+    var xP = getRandomInt(-2000, 2000);
+    var yP = getRandomInt(-2000, 2000);
     
-    if (Math.sign(xP) == -1 && xP > -start + scrollOffset.x) {
-        xP -= start;
+    while (!(Math.abs(xP) > start && Math.abs(yP) > start)) {
+        xP = getRandomInt(-2000, 2000);
+        yP = getRandomInt(-2000, 2000);
+
+        if((Math.abs(xP) > start && Math.abs(yP) > start)) {
+            enemies.push(new Enemy(xP, yP, siz, 500, health, col, dam, 1));
+            return;
+        }
     }
-    
-    if (Math.sign(xP) == 1 && xP < start + scrollOffset.x) {
-        xP += start;
-    }
-    
-    if (Math.sign(yP) == -1 && yP > -start + scrollOffset.y) {
-        yP -= start;
-    }
-    
-    if (Math.sign(yP) == 1 && yP < start + scrollOffset.y) {
-        yP += start;
-    }
-    
-    enemies.push(new Enemy(xP, yP, siz, 500, health, col, dam, 1));
 }
 
 function SpawnEnemy2(x, y, health, col, dam, siz) {
@@ -716,7 +709,7 @@ function playerMove() {
     //testing spawn enemies
     if (score > 100 && s1) {
         for (i = 0; i< 2000; i++) {
-            SpawnEnemy(200, 100, "lightred", 10, 40);
+            SpawnEnemy(300, 100, "lightred", 10, 40);
             
         }
         s1 = false
@@ -724,16 +717,17 @@ function playerMove() {
     if (score > 500 && s2) {
         
         for (i = 0; i< 1000; i++) {
-            SpawnEnemy(200, 500, "darkgreen", 20, 60);
+            SpawnEnemy(300, 500, "darkgreen", 20, 60);
         }
         s2 = false
     }
     if (score > 1000 && s3) {
         
-        for (i = 0; i< 500; i++) {
-            SpawnEnemy(200, 500, "deepblue", 40, 100);
+        for (i = 0; i< 200; i++) {
+            //enemies.splice(i, 0);
+            SpawnEnemy(300, 900, "purple", 40, 100);
         }
-        s2 = false
+        s3 = false
     }
     ////////
     
@@ -854,7 +848,7 @@ function bulletMove() {
             if (player.bullets[i].x - 5 < enemies[e].x + (enemies[e].s / 2) && player.bullets[i].x + 5 > enemies[e].x - (enemies[e].s / 2) &&
                player.bullets[i].y - 5 < enemies[e].y + (enemies[e].s / 2) && player.bullets[i].y + 5 > enemies[e].y - (enemies[e].s / 2)) {
                 KillEnemy(i, e, enemies[e].x, enemies[e].y);
-                SpawnEnemy(200, 100, "red", 10, 40);
+                SpawnEnemy(300, 100, "red", 10, 40);
                 break;
             }
             
