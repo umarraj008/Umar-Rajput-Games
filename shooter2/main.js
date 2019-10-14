@@ -947,6 +947,8 @@ function find_angle(A,B,C) {
 }
 
 document.onmousemove = handleMouseMove;
+document.onmousedown = MouseDown;
+document.onmouseup = MouseUp;
 var MouseX;
 var MouseY;
 function handleMouseMove(event) {
@@ -1023,6 +1025,16 @@ function handleMouseMove(event) {
     
 }
 
+function MouseDown(event) {
+    player.shoot = true;
+    player.image = playerShootIMG;
+}
+
+function MouseUp(event) {
+    player.shoot = false;
+    player.canShoot = true;
+}
+
 //INPUT
 document.addEventListener("keydown", event => {
     if (!displayMenu) {
@@ -1094,10 +1106,7 @@ document.addEventListener("click", event => {
     if (!displayMenu) {
         if (!gamePause) {
             if (!gameOver) {
-                if (player.canShoot) {
-                    Shoot();
-                    player.image = playerShootIMG;
-                }
+                
             } else {
                 if (MouseX <= (menu.buttons.gameBack.x + menu.buttons.gameBack.w) && MouseX >= menu.buttons.gameBack.x &&
                     MouseY <= (menu.buttons.gameBack.y + menu.buttons.gameBack.h) && MouseY >= menu.buttons.gameBack.y) {
