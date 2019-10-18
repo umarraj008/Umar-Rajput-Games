@@ -11,7 +11,7 @@ class star {
     constructor() {
         this.x = genRand(-c.width / 2, c.width / 2, 1);
         this.y = genRand(-c.height / 2, c.height / 2, 1);
-        this.z = genRand(0, 800, 1);
+        this.z = genRand(0, c.width / 2, 1);
         this.size = genRand(1, 7, 1);
         this.col1 =genRand(0, 255, 1);
         this.col2 =genRand(0, 255, 1);
@@ -51,7 +51,7 @@ function update(time = 0) {
         if (s.z < 1) {
             s.x = genRand(-c.width / 2, c.width / 2, 1);
             s.y = genRand(-c.height / 2, c.height / 2, 1);
-            s.z = 800;
+            s.z = c.width / 2;
             s.col1 =genRand(0, 255, 1);
             s.col2 =genRand(0, 255, 1);
             s.col3 =genRand(0, 255, 1);
