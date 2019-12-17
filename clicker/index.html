@@ -1,0 +1,108 @@
+<html>
+    <head>
+        <title>Clicker Game</title>
+		<link href="https://fonts.googleapis.com/css?family=Roboto:300,400,700&display=swap" rel="stylesheet">
+        <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+        <style>
+            body {
+                background: #000000;
+                color: #fff;
+				background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+                background-size: 400% 400%;
+                animation: gradientBG 15s ease infinite;    
+                overflow: hidden;
+            }
+            
+            @keyframes gradientBG {
+                0% {
+                    background-position: 0% 50%;
+                }
+                50% {
+                    background-position: 100% 50%;
+                }
+                100% {
+                    background-position: 0% 50%;
+                }
+            }
+            
+            * {
+                margin: 0;
+                padding: 0;
+                font-family: "roboto";
+                font-weight: 300;
+                color: white;
+                user-select: none;
+            }
+            
+            /* GAME CONTAINER */
+            #game {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                width: 1300px;
+                height: 900px;
+                
+            }
+            
+            /* MENU */
+            #menu_container {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -55%);
+                align-content: center;
+                width: 940px;
+            
+            }
+            
+            .button {
+                width: 300px;
+                height: 100px;
+                margin: 5px;
+                font-size: 50px;
+                font-family: "roboto";
+                font-weight: 300;
+                border-radius: 7px;
+                border: solid white 2px;
+                background-color: transparent;
+                transition: 0.2s ease-in-out;
+                z-index: -10;
+            }
+            
+            .button:hover {
+                background-color: rgba(255, 255, 255, 0.3);
+                cursor: pointer;
+                
+            }
+            
+            #menu_container h1 {
+                font-size: 100px;
+                font-family: "roboto";
+                font-weight: 300;
+                transition: 0.4s ease-out;
+            }
+            
+            h1 {
+                z-index: 0;
+            }
+            
+            
+        </style>
+    </head>
+    <body>
+        <!-- DOM ELEMENTS -->
+        <div id="game" width="1000px" height="800px">
+            <div id="menu_container">
+                <h1 id="menu_title"><center>Clicker Game</center></h1>
+                <button class="button" id="button_play1">10 Seconds</button>
+                <button class="button" id="button_play2">20 Seconds</button>
+                <button class="button" id="button_play3">30 Seconds</button>
+            </div>
+        </div>
+        
+        
+        <!-- SCRIPTS -->
+        <script src="main.js"></script>
+    </body>
+</html>
