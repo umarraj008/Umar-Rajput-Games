@@ -204,7 +204,7 @@ document.onmousemove = function(e) {
 document.addEventListener("keydown", e => {
     if (e.keyCode == 32) {
         if (clickable && up) {
-            clicks++;
+            //clicks++;
         }
     }
     
@@ -212,9 +212,9 @@ document.addEventListener("keydown", e => {
 
 document.addEventListener("keyup", e => {
       if (e.keyCode == 32) {
-         up = false; 
+         //up = false; 
       } else {
-          up = true;
+          //up = true;
       }
 });
 
