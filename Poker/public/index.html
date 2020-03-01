@@ -1,0 +1,40 @@
+<html>
+    <head>
+        <title>Poker</title>
+		<link href="https://fonts.googleapis.com/css?family=Roboto:300,400,700&display=swap" rel="stylesheet">
+        <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+        <style>
+            body {
+                color: #fff;
+				            
+            }
+            
+            * {
+                margin: 0;
+                padding: 0;
+                font-family: Roboto;
+            }
+            canvas#canvas {
+                /*width: 80%;*/
+                position: absolute;
+                margin-left: 3%;
+                margin-right: 3%;
+                width: 94vmax;
+                height: 46vmax;
+                overflow: hidden;
+            }
+            
+        </style>
+    </head>
+    <body background="bgImg.jpg" id="body">
+        <!-- DOM ELEMENTS -->
+        <img id="tblImg" src="tblImg.jpg" width="0">
+        <img id="pokertable" src="pokertable.png" width="0">
+        <canvas id="canvas" width="1920" height="1080"></canvas>
+        <!-- SCRIPTS -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/CanvasInput/1.2.7/CanvasInput.js" integrity="sha256-ZekO/OWHfsj1RtRDOEa4kcTkva1+on3zS8wfHlwZRCk=" crossorigin="anonymous"></script>
+        
+        <script src="client.js"></script>
+        <script src="main.js"></script>
+    </body>
+</html>
