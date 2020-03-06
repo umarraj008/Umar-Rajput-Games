@@ -938,11 +938,11 @@ goTitleIMG.onload = function() {imgLoad();}
 waterIMG.onload = function() {imgLoad();}
 
 //set image source
-lockIMG.src = "images/Lock.png";
+lockIMG.src = "images/lock.png";
 backgroundImg.src = "images/backbackgrdn.png";
 htpInfoIMG.src = "images/htpInfo.png";
 htpTextIMG.src = "images/htpText.png";
-titleIMG.src = "images/logo.png";
+titleIMG.src = "images/Logo.png";
 spritesheet.src = "images/spritesheet.png";
 gSpritesheet.src = "images/gSpritesheet.png";
 backgroundIMG1.src = "images/background2.png";
