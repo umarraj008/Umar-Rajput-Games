@@ -1,60 +1,185 @@
-<!doctype html>
 <html>
     <head>
-        <title></title>
-		<link href="https://fonts.googleapis.com/css?family=Roboto:300,400,700&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css?family=Raleway:100,200,300&display=swap" rel="stylesheet">
+        <title>Umar Rajput Games</title>
         <style>
             body {
-                background: #000000;
-                color: #fff;
-				            
-            }
-            
-            * {
                 margin: 0;
-                padding: 0;
-                font-family: Roboto;
+                width: 100%;
+                height: 100vh;
+                font-family: "Exo", sans-serif;
+                color: #fff;
+                background: linear-gradient(-45deg, #f12711, #f5af19, #a8ff78, #78ffd6);
+                background-size: 400% 400%;
+                animation: gradientBG 15s ease infinite;
+                overflow: hidden;
+                user-select: none;
+                
+            }
+
+            .wrapper { 
+              height: 100%;
+              width: 100%;
+              left:0;
+              right: 0;
+              top: 0;
+              bottom: 0;
+              position: absolute;
+            background: linear-gradient(124deg, #ff2400, #e81d1d, #e8b71d, #e3e81d, #1de840, #1ddde8, #2b1de8, #dd00f3, #dd00f3);
+            background-size: 1800% 1800%;
+                  animation: rainbow 18s ease infinite;}
+            
+            @keyframes rainbow { 
+                0%{background-position:0% 82%}
+                50%{background-position:100% 19%}
+                100%{background-position:0% 82%}
             }
             
-            canvas {
-                width: 80%;
-                border: solid 3px white;
+            #container {
                 position: absolute;
-                margin-left: 10%;
-                margin-top: 20px;
+                width: 1940;
+                height: 100%;
+                overflow: hidden;
             }
             
+            .grid-item {
+                float:left;
+                display: grid;
+                grid-column-gap: 50px;
+                grid-row-gap: 50px;
+                width: 384px;
+                height: 25%;
+                background: rgba(255,255,255,0);
+                /*border: solid black 2px;*/
+                text-align: center;
+                overflow: hidden;
+                
+            }
+            
+            .grid-item h1 {
+                z-index: 5;
+                transform: translateY(-40px);
+                position: absolute;
+                font-family: Raleway;
+                font-weight: 200;
+                font-size: 60px;
+                
+                
+            }
+            
+            .grid-item img {
+                transition: .4s ease-in-out;
+                
+                
+            }
+            
+            .grid-item:hover img {
+                transform: scale(1.2);
+                cursor: pointer;
+            }
+            
+            .box {
+              margin: 0 auto;
+              width: 100%;
+              height: 100%;
+              position: relative;
+              overflow: hidden;
+                text-align: center;
+                pointer-events: none;
+                z-index: 7;
+            
+            }
+            
+            .box b {
+                
+                font-size: 100px;
+                font-family: Raleway;
+                font-weight: 300;
+                margin-top: 5%;
+                text-shadow: 4px 4px #000;
+            }
+            .box b {
+              display: block;
+              width: 300px;
+              height: 260px;
+              position: absolute;
+              animation: moveX 7.05s linear 0s infinite alternate, moveY 7.4s linear 0s infinite alternate;
+            }
+
+            @keyframes moveX {
+              from { left: 0; } to { left: 1620px; }
+            }
+            
+            @keyframes moveY {
+              from { top: -120; } to { top: 650; }
+            }
+            
+            .name {
+                position: absolute;
+                z-index: 10;
+                font-size: 60px;
+                font-family: Raleway;
+                font-weight: 300;
+                text-shadow: 3px 3px #000;
+                bottom: 5px;
+                left:0px;
+
+            }
+            
+            .site {
+                position: absolute;
+                z-index: 10;
+                font-size: 40px;
+                font-family: Raleway;
+                font-weight: 300;
+                text-shadow: 2px 2px #000;
+                bottom:-25px;
+                left:0px;
+            }
+            
+            .version {
+                position: absolute;
+                z-index: 10;
+                font-size: 30px;
+                font-family: Raleway;
+                font-weight: 300;
+                text-shadow: 4px 4px #000;
+                bottom:-20px;
+                right:5px;
+            }
         </style>
     </head>
-    <body id="body">
+    
+    <body class="wrapper">
+        <h1 class="name">Umar Rajput</h1>
+        <h2 class="site">umarraj008.github.io</h2>
+        <div id="container">
+            <div class="grid-item"><h1>X and O</h1><img width="100%" src="MenuImages/xandoPlate.png" onclick="location.href='XandO/index.html'"/></div>
+            <div class="grid-item"><img width="100%" src="MenuImages/tetrisPlate.png" onclick="location.href='Tetris/v2/index.html'" /><h1>Tetris</h1></div>
+            <div class="grid-item"><img width="100%" src="MenuImages/flappyPlate.png" onclick="location.href='FlappyBird/index.html'" /><h1>Flappy Bird</h1></div>
+            <div class="grid-item"><img width="100%" src="MenuImages/stackerPlate.png" onclick="location.href='Stacker/index.html'" /><h1>Stacker</h1></div>
+            <div class="grid-item"><img width="100%" src="MenuImages/snakePlate.png" onclick="location.href='Snake/index.html'" /><h1>Snake</h1></div>
+            <div class="grid-item"><img width="100%" src="MenuImages/pongPlate.png" onclick="location.href='Pong/index.html'" /><h1>Tennis For 2</h1></div>
+            <div class="grid-item"><img width="100%" src="MenuImages/shooterPlate.png" onclick="location.href='shooter2/index.html'" /><h1>Shooter</h1></div>
+            <div class="grid-item"><img width="100%" src="MenuImages/ckickerImg.png" onclick="location.href='clicker/index.html'" /><h1>Clicker</h1></div>
+            <div class="grid-item" style="background-color: rgba(0,0,0,0.6);" onclick="location.href='Poker/public/index.html'"><h1>Poker</h1></div>
+            <div class="grid-item"><img width="100%" src="MenuImages/sonicPlate.png" onclick="location.href='Sonic/Sonic/index.html'" /><h1>Sonic</h1></div>
+            <div class="grid-item"><h1></h1></div>
+            <div class="grid-item"><h1></h1></div>
+            <div class="grid-item"><h1></h1></div>
+            <div class="grid-item"><h1></h1></div>
+            <div class="grid-item"><h1></h1></div>
+            <div class="grid-item"><h1></h1></div>
+            <div class="grid-item"><h1></h1></div>
+            <div class="grid-item"><h1></h1></div>
+            <div class="grid-item"><h1></h1></div>
+            <div class="grid-item"><h1></h1></div>
+        </div>
+        <div class="box"><b>Umar Rajput</b></div>
         
-		<canvas id="canvas" width="1920" height="1080" onload="incrementLoadCounter()"></canvas> 
-		<img id="background" src="images/backbackgrdn.png" width="0" onload="incrementLoadCounter()"/>
-		<img id="title" src="images/logo.png" width="0" onload="incrementLoadCounter()"/>
-		<img id="ss" src="images/spritesheet.png" width="0" onload="incrementLoadCounter()"/>
-		<img id="b1" src="images/background2.png" width="0" onload="incrementLoadCounter()"/>
-		<img id="platforms" src="images/platforms.png" width="0" onload="incrementLoadCounter()"/>
-		<img id="htp" src="images/htpInfo.png" width="0" onload="incrementLoadCounter()"/>
-		<img id="htpText" src="images/htpText.png" width="0" onload="incrementLoadCounter()"/>
-		<img id="goTitle" src="images/gameOverTitle.png" width="0" onload="incrementLoadCounter()"/>
-		<img id="ywTitle" src="images/YouWinTitle.png" width="0" onload="incrementLoadCounter()"/>
-		<img id="lsTitle" src="images/LevelSelectTitle.png" width="0" onload="incrementLoadCounter()"/>
-		<img id="lock" src="images/lock.png" width="0" onload="incrementLoadCounter()"/>
-		<img id="water" src="images/waterSpriteSheet.png" width="0" onload="incrementLoadCounter()"/>
-		<p id="c" class="0"></p>
-	<script>
-		var totalImages = 12;
-		var loadCounter = 0;
-
-		function incrementLoadCounter() {
- 		  loadCounter++;
-		   if(loadCounter === totalImages) {
-		      var x = document.createElement("script");
-			x.setAttribute('src', 'main.js');
-			document.getElementById("body").appendChild(x);
- 		  }
-		}
-
-	</script>
+        <script>
+            
+        </script>
     </body>
+    
 </html>
