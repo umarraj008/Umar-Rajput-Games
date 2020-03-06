@@ -29,45 +29,19 @@
     <body id="body">
         
 		<canvas id="canvas" width="1920" height="1080"></canvas> 
-		<img id="background" src="images/backbackgrdn.png" width="0" onload="incrementLoadCounter()" onerror="reload('background', 'backbackgrd')"/>
-		<img id="title" src="images/Logo.png" width="0" onload="incrementLoadCounter()" onerror="reload('title', 'Logo')"/>
-		<img id="ss" src="images/spritesheet.png" width="0" onload="incrementLoadCounter()" onerror="reload('ss', 'spritesheet')"/>
-		<img id="b1" src="images/background2.png" width="0" onload="incrementLoadCounter()" onerror="reload('b1', 'background2')"/>
-		<img id="platforms" src="images/platforms.png" width="0" onload="incrementLoadCounter()" onerror="reload('platforms', 'platforms')"/>
-		<img id="htp" src="images/htpInfo.png" width="0" onload="incrementLoadCounter()" onerror="reload('htp', 'htpInfo')"/>
-		<img id="htpText" src="images/htpText.png" width="0" onload="incrementLoadCounter()" onerror="reload('htpText', 'htpText')"/>
-		<img id="goTitle" src="images/gameOverTitle.png" width="0" onload="incrementLoadCounter()" onerror="reload('goTitle', 'gameOverTitle')"/>
-		<img id="ywTitle" src="images/YouWinTitle.png" width="0" onload="incrementLoadCounter()" onerror="reload('ywTitle', 'YouWinTitle')"/>
-		<img id="lsTitle" src="images/LevelSelectTitle.png" width="0" onload="incrementLoadCounter()" onerror="reload('lsTitle', 'LevelSelectTitle')"/>
-		<img id="lock" src="images/lock.png" width="0" onload="incrementLoadCounter()" onerror="reload('lock', 'lock')"/>
-		<img id="water" src="images/waterSpriteSheet.png" width="0" onload="incrementLoadCounter()" onerror="reload('water', 'waterSpriteSheet')"/>
-
-        <script type="text/javascript">
-            var totalImages = 12;
-            var loadCounter = 0;
-
-            function incrementLoadCounter() {
-                loadCounter++;
-                console.log("image loaded")
-                if(loadCounter === totalImages) {
-                    var x = document.createElement("script");
-                    x.setAttribute('src', 'main.js');
-                    document.getElementById("body").appendChild(x);
-                }
-            }
-
-            function reload(imgID, sc) {
-                var i = document.createElement("img");
-                i.setAttribute("id", imgID);
-                i.setAttribute("src", "images/" + sc + ".png");
-                i.setAttribute("onload", incrementLoadCounter());
-                i.setAttribute("onerror", reload(imgID, sc));
-
-                var b = document.getElementById("body");
-                b.removeChild(document.getElementById(imgID));
-                b.appendChild(i);
-            }
-
-	   </script>
+		<img id="background" src="images/backbackgrdn.png" width="0"/>
+		<img id="title" src="images/Logo.png" width="0"/>
+		<img id="ss" src="images/spritesheet.png" width="0"/>
+		<img id="gss" src="images/gSpritesheet.png" width="0"/>
+		<img id="b1" src="images/background2.png" width="0"/>
+		<img id="platforms" src="images/platforms.png" width="0"/>
+		<img id="htp" src="images/htpInfo.png" width="0"/>
+		<img id="htpText" src="images/htpText.png" width="0"/>
+		<img id="goTitle" src="images/gameOverTitle.png" width="0"/>
+		<img id="ywTitle" src="images/YouWinTitle.png" width="0"/>
+		<img id="lsTitle" src="images/LevelSelectTitle.png" width="0"/>
+		<img id="lock" src="images/lock.png" width="0"/>
+		<img id="water" src="images/waterSpriteSheet.png" width="0"/>
+        <script src="main.js" type="text/javascript"></script>
     </body>
 </html>

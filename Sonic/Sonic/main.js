@@ -23,7 +23,7 @@ var waterIMG = document.getElementById("water");
 
 var l2Unlock = false; // FALSE ON RELEASE
 var l3Unlock = false; // FALSE ON RELEASE
-var state = "menu"; // "menu ON RELEASE
+var state = "loading"; // "menu ON RELEASE
 var menuBackScrollX1 = 0;
 var menuBackScrollX2 = 0;
 var scroll = {x: 0, y: 0};
@@ -476,6 +476,13 @@ function update(time = 0) {
     lastTime = time;
     
     switch(state) {
+        case "loading":
+            ctx.textAlign = "center";
+            ctx.font = "50px roboto";
+            ctx.fillStyle = "white";
+            ctx.fillText("Loading...", c.width / 2, c.height /2);
+            break;
+        
         case "menu":
             DrawMenu();
             break;
@@ -741,4 +748,50 @@ function genRand(min, max, decimalPlaces) {
     return Math.floor(rand*power) / power;
 }
 
-window.onload = update();
+function checkImg(i) {
+    var img = document.querySelector(i);
+    if (!img.complete) {
+        console.log(img +  " failed")
+        return false;
+    }
+
+    if (img.naturalWidth == 0) {
+        console.log(img, "failed")
+        return false;
+    }
+
+    img.width = 0;
+    return true;
+}
+
+lockIMG.onload = function() {imgLoad();}
+backgroundImg.onload = function() {imgLoad();}
+htpInfoIMG.onload = function() {imgLoad();}
+htpTextIMG.onload = function() {imgLoad();}
+titleIMG.onload = function() {imgLoad();}
+spritesheet.onload = function() {imgLoad();}
+gSpritesheet.onload = function() {imgLoad();}
+backgroundIMG1.onload = function() {imgLoad();}
+platformsIMG.onload = function() {imgLoad();}
+lsTitleIMG.onload = function() {imgLoad();}
+ywTitleIMG.onload = function() {imgLoad();}
+goTitleIMG.onload = function() {imgLoad();}
+waterIMG.onload = function() {imgLoad();}
+
+
+var imgCount = 0, imgMax = 13;
+function imgLoad() {
+    imgCount++;
+    console.log(imgCount);
+    if (imgCount == imgMax) {
+        state = "menu"
+    }
+}
+
+window.setTimeout( function() {
+    if (imgCount !== imgMax) {
+        location.reload();
+    }
+}, 3000)
+
+update();
