@@ -47,12 +47,13 @@
 		var loadCounter = 0;
 
 		function incrementLoadCounter() {
- 		  loadCounter++;
-		   if(loadCounter === totalImages) {
-		      var x = document.createElement("script");
+		    loadCounter++;
+		    console.log("image loaded", loadCounter);
+		    if(loadCounter === totalImages) {
+		        var x = document.createElement("script");
 			x.setAttribute('src', 'main.js');
 			document.getElementById("body").appendChild(x);
- 		  }
+ 		     }
 		}
 
 	</script>
