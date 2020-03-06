@@ -1,10 +1,11 @@
+<!doctype html>
 <html>
     <head>
-        <title>Poker</title>
+        <title></title>
 		<link href="https://fonts.googleapis.com/css?family=Roboto:300,400,700&display=swap" rel="stylesheet">
-        <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
         <style>
             body {
+                background: #000000;
                 color: #fff;
 				            
             }
@@ -14,27 +15,46 @@
                 padding: 0;
                 font-family: Roboto;
             }
-            canvas#canvas {
-                /*width: 80%;*/
+            
+            canvas {
+                width: 80%;
+                border: solid 3px white;
                 position: absolute;
-                margin-left: 3%;
-                margin-right: 3%;
-                width: 94vmax;
-                height: 46vmax;
-                overflow: hidden;
+                margin-left: 10%;
+                margin-top: 20px;
             }
             
         </style>
     </head>
-    <body background="bgImg.jpg" id="body">
-        <!-- DOM ELEMENTS -->
-        <img id="tblImg" src="tblImg.jpg" width="0">
-        <img id="pokertable" src="pokertable.png" width="0">
-        <canvas id="canvas" width="1920" height="1080"></canvas>
-        <!-- SCRIPTS -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/CanvasInput/1.2.7/CanvasInput.js" integrity="sha256-ZekO/OWHfsj1RtRDOEa4kcTkva1+on3zS8wfHlwZRCk=" crossorigin="anonymous"></script>
+    <body id="body">
         
-        <script src="client.js"></script>
-        <script src="main.js"></script>
+		<canvas id="canvas" width="1920" height="1080" onload="incrementLoadCounter()"></canvas> 
+		<img id="background" src="images/backbackgrdn.png" width="0" onload="incrementLoadCounter()"/>
+		<img id="title" src="images/logo.png" width="0" onload="incrementLoadCounter()"/>
+		<img id="ss" src="images/spritesheet.png" width="0" onload="incrementLoadCounter()"/>
+		<img id="b1" src="images/background2.png" width="0" onload="incrementLoadCounter()"/>
+		<img id="platforms" src="images/platforms.png" width="0" onload="incrementLoadCounter()"/>
+		<img id="htp" src="images/htpInfo.png" width="0" onload="incrementLoadCounter()"/>
+		<img id="htpText" src="images/htpText.png" width="0" onload="incrementLoadCounter()"/>
+		<img id="goTitle" src="images/gameOverTitle.png" width="0" onload="incrementLoadCounter()"/>
+		<img id="ywTitle" src="images/YouWinTitle.png" width="0" onload="incrementLoadCounter()"/>
+		<img id="lsTitle" src="images/LevelSelectTitle.png" width="0" onload="incrementLoadCounter()"/>
+		<img id="lock" src="images/lock.png" width="0" onload="incrementLoadCounter()"/>
+		<img id="water" src="images/waterSpriteSheet.png" width="0" onload="incrementLoadCounter()"/>
+		<p id="c" class="0"></p>
+	<script>
+		var totalImages = 12;
+		var loadCounter = 0;
+
+		function incrementLoadCounter() {
+ 		  loadCounter++;
+		   if(loadCounter === totalImages) {
+		      var x = document.createElement("script");
+			x.setAttribute('src', 'main.js');
+			document.getElementById("body").appendChild(x);
+ 		  }
+		}
+
+	</script>
     </body>
 </html>
