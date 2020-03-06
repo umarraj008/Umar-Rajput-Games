@@ -741,4 +741,4 @@ function genRand(min, max, decimalPlaces) {
     return Math.floor(rand*power) / power;
 }
 
-update();
+window.onload = update();
