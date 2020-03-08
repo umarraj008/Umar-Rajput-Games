@@ -3,6 +3,7 @@
     <head>
         <title></title>
 		<link href="https://fonts.googleapis.com/css?family=Roboto:300,400,700&display=swap" rel="stylesheet">
+        <link rel="icon" href="../logo/favicon.png">
         <style>
             body {
                 background: #000000;
@@ -17,19 +18,21 @@
             }
             
             canvas {
-                width: 80%;
-                border: solid 3px white;
+                overflow: hidden;
+                /*width: 80%; */
                 position: absolute;
-                margin-left: 10%;
-                margin-top: 20px;
+                margin-left: 0%; /*10% */
+                margin-top: 0px; /*20px */
+                height: 100%;
             }
-            
         </style>
     </head>
     <body id="body">
-        
-        
-		<canvas id="canvas" width="1920" height="1080"></canvas> 
+        <canvas id="canvas" width="1920" height="1080"></canvas> 
+        <img id="sFace" width="0"/>
+		<img id="ml" width="0"/>
+		<img id="bbg" width="0"/>
+		<img id="fbg" width="0"/>
 		<img id="background" width="0"/>
 		<img id="title" width="0"/>
 		<img id="ss" width="0"/>
@@ -44,6 +47,5 @@
 		<img id="lock" width="0"/>
 		<img id="water" width="0"/>
         <script src="main.js" type="text/javascript"></script>
-	<!-- test -->
     </body>
 </html>

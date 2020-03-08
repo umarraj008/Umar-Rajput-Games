@@ -7,6 +7,10 @@ ctx.imageSmoothingEnabled = false;
 let lastTime = 0;
 var dt;
 
+var sonicFace = document.getElementById("sFace");
+var myLogo = document.getElementById("ml");
+var BBG = document.getElementById("bbg");
+var FBG = document.getElementById("fbg");
 var lockIMG = document.getElementById("lock");
 var backgroundImg = document.getElementById("background");
 var htpInfoIMG = document.getElementById("htp");
@@ -14,35 +18,39 @@ var htpTextIMG = document.getElementById("htpText");
 var titleIMG = document.getElementById("title");
 var spritesheet = document.getElementById("ss");
 var gSpritesheet = document.getElementById("gss");
-var backgroundIMG1 = document.getElementById("b1");
 var platformsIMG = document.getElementById("platforms");
 var lsTitleIMG = document.getElementById("lsTitle");
 var ywTitleIMG = document.getElementById("ywTitle");
 var goTitleIMG = document.getElementById("goTitle");
 var waterIMG = document.getElementById("water");
-
+var paralaxSpeed = {p1: 4, p2: 2};
+var background1X = 0;
+var background2X = 0;
+var background3X = 0;
 var l2Unlock = false; // FALSE ON RELEASE
 var l3Unlock = false; // FALSE ON RELEASE
-var state = "loading"; // "menu ON RELEASE
+var state = "loading"; // "loading" ON RELEASE
+var menuPulse = 0;
+var menuZoom = true;
 var menuBackScrollX1 = 0;
 var menuBackScrollX2 = 0;
-var scroll = {x: 0, y: 0};
+var scroll = {x: 0, y: 0, boundLeft: 400, boundRight: 1100, smoothing: 0.5, speed: 15};
 
 var loadingCircleR = 0;
 
 var transisionOut = {
     enabled: false,
     x: 0,
-    speed: 80,
+    speed: 0.02,
     state: null,
-    color: "#f6ff4f",
+    color: "#000",
 }
 
 var transisionIn = {
     enabled: false,
-    x: 0,
-    speed: 80,
-    color: "#f6ff4f",
+    x: 1,
+    speed: 0.03,
+    color: "#000",
 }
 
 var buttons = {
@@ -68,48 +76,66 @@ var player = new function() {
     this.y = 0;
     this.yVel = 0;
     this.jumping = false;
+    this.jumpHeight = 30;
+    this.jumpSpeed = 10;
     this.grounded = false;
     this.left = false;
     this.right = false;
-    this.speed = 7;
+    this.speed = 15;
     this.gravity = 2;
     this.width = 150;
     this.height = 200;
     //this.width = 600;
     //this.height = 700;
+    this.canJump = true;
+    this.dead = false;
+    this.deathDown = false;
+    this.boundingBox = false;
     
     //animation
     this.state = "walk";
     this.fCount = 0;
 	this.images = [
         //idle
-        {x: 180, y: 1036, w: 30, h: 40}, 
-        {x: 213, y: 1036, w: 30, h: 40}, 
-        {x: 244, y: 1036, w: 30, h: 40}, 
-        {x: 213, y: 1036, w: 30, h: 40},
+        {x: 180, y: 1036, w: 30, h: 40}, //0
+        {x: 213, y: 1036, w: 30, h: 40}, //1
+        {x: 244, y: 1036, w: 30, h: 40}, //2
+        {x: 213, y: 1036, w: 30, h: 40}, //3
 
         //walk right
-        {x: 319, y: 330, w: 30, h: 40}, 
-        {x: 351, y: 330, w: 30, h: 40}, 
-        {x: 385, y: 330, w: 30, h: 40}, 
-        {x: 422, y: 330, w: 30, h: 40}, 
-        {x: 458, y: 330, w: 30, h: 40}, 
-        {x: 491, y: 330, w: 30, h: 40}, 
-        {x: 526, y: 330, w: 30, h: 40}, 
-        {x: 562, y: 330, w: 30, h: 40}, 
+        {x: 319, y: 330, w: 30, h: 40}, //4
+        {x: 351, y: 330, w: 30, h: 40}, //5
+        {x: 385, y: 330, w: 30, h: 40}, //6
+        {x: 422, y: 330, w: 30, h: 40}, //7
+        {x: 458, y: 330, w: 30, h: 40}, //8
+        {x: 491, y: 330, w: 30, h: 40}, //9
+        {x: 526, y: 330, w: 30, h: 40}, //10
+        {x: 562, y: 330, w: 30, h: 40}, //11
         
         //walk left
-        {x: 563, y: 379, w: 30, h: 40}, 
-        {x: 531, y: 379, w: 30, h: 40}, 
-        {x: 497, y: 379, w: 30, h: 40}, 
-        {x: 460, y: 379, w: 30, h: 40}, 
-        {x: 424, y: 379, w: 30, h: 40}, 
-        {x: 391, y: 379, w: 30, h: 40}, 
-        {x: 356, y: 379, w: 30, h: 40}, 
-        {x: 320, y: 379, w: 30, h: 40}, 
+        {x: 563, y: 379, w: 30, h: 40}, //12
+        {x: 531, y: 379, w: 30, h: 40}, //13
+        {x: 497, y: 379, w: 30, h: 40}, //14
+        {x: 460, y: 379, w: 30, h: 40}, //15
+        {x: 424, y: 379, w: 30, h: 40}, //16
+        {x: 391, y: 379, w: 30, h: 40}, //17
+        {x: 356, y: 379, w: 30, h: 40}, //18
+        {x: 320, y: 379, w: 30, h: 40}, //19
+        
+        //jump
+        {x: 315, y: 444, w: 30, h: 40}, //20
+        {x: 365, y: 444, w: 30, h: 40}, //21
+        {x: 415, y: 444, w: 30, h: 40}, //22
+        {x: 465, y: 444, w: 30, h: 40}, //23
+        {x: 515, y: 444, w: 30, h: 40}, //24
+        {x: 565, y: 444, w: 30, h: 40}, //25
+        
+        //dead
+        {x: 219, y: 906, w: 33, h: 40}, //26
+        
     ]
     this.c = 0;
-	
+    
 	    
     this.draw = function() {
         //ctx.drawImage(sonicImg, this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
@@ -124,8 +150,10 @@ var player = new function() {
         
         
         //col box
-        ctx.strokeStyle = "red"
-        ctx.strokeRect(this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
+        if (this.boundingBox) {
+            ctx.strokeStyle = "red"
+            ctx.strokeRect(this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
+        }
         
             
         switch (this.state) {
@@ -159,8 +187,32 @@ var player = new function() {
                     this.c = 0;
                     this.fCount++;
 
-                    if (this.fCount > 18) { //19 12
+                    if (this.fCount > 19) { //19 12
                         this.fCount = 12;
+                    }
+                }
+                break;
+            
+            case "jump":
+                this.c += dt;
+                if (this.c > 50) {
+                    this.c = 0;
+                    this.fCount++;
+
+                    if (this.fCount > 25) { //19 12
+                        this.fCount = 25;
+                    }
+                }
+                break;
+                
+            case "dead":
+                this.c += dt;
+                if (this.c > 50) {
+                    this.c = 0;
+                    this.fCount++;
+
+                    if (this.fCount > 26) { //19 12
+                        this.fCount = 26;
                     }
                 }
                 break;
@@ -234,36 +286,118 @@ var player = new function() {
     
     
     this.move = function() {
-        //player move
+        
+        //player move left right
         if (this.left) {
-            this.state = "walkL";
+            if (this.grounded && !this.jumping) {
+                this.state = "walkL";
+            }
+            
             this.x-= this.speed;
+        
         } else if (this.right) {
-            this.state = "walkR";
+            if (this.grounded && !this.jumping) {
+                this.state = "walkR";
+            }
+            
             this.x+= this.speed;
-        } else if (!this.right && !this.left) {
+        
+        }
+        
+        if (!this.right && !this.left && this.grounded && !this.jumping) {
             this.state = "idle"
         }
-    
-        //platform collision
-        if (this.platformTOPcol(platforms1[0].x, platforms1[0].y, platforms1[0].width, platforms1[0].height)) {
+        
+        
+        //platform collision - set grounded val
+        if (this.groundCol()) {
+            
+            if (!this.grounded) {
+                var t = this.find_colided_platform();
+
+                if (this.y + this.height / 2 > platforms1[t].y) {
+                    this.y -= ((this.y + (this.height / 2)) - platforms1[t].y);
+                }
+            }
+            
+            this.canJump = true;
             this.grounded = true;
-        } else {this.grounded = false;}
+            
+        } else {
+            this.grounded = false;
+        }
+        
         
         //gravity
         if (!this.grounded && !this.jumping) {
             this.yVel += this.gravity;
-        } else {
+        } else if (this.grounded) {
             this.yVel = 0;
         }
         
+        
+        //jumping
+        if (this.jumping) {
+            this.state = "jump";
+            this.grounded = false;
+            this.yVel -= this.jumpSpeed;
+            if (Math.abs(this.yVel) > this.jumpHeight) {
+                this.jumping = false;
+            }
+        }
+        
+        //dead
+        if ((this.y - this.height / 2) > c.width) {
+            scroll.x = 0;
+            this.yVel = 0;
+            this.right = false;
+            this.left = false;
+            this.jumping = false;
+            this.grounded = false;
+            this.dead = true;
+            this.y = c.height + this.height / 2;
+        }
+        
+        
+        //camera scroll
+        if (player.x > scroll.boundRight) {
+            if(Math.abs(scroll.x) < scroll.speed) {
+                scroll.x -= 2;
+            }
+        } else if (player.x < scroll.boundLeft) {
+            if(Math.abs(scroll.x) < scroll.speed) {
+                scroll.x += 2;
+            }
+        } else {
+            if (Math.abs(scroll.x) > 0) {
+                if (scroll.x > 0) {
+                    scroll.x -= scroll.smoothing;
+                } else {
+                    scroll.x += scroll.smoothing;
+                }
+
+                if (Math.abs(scroll.x) <= 0.2) {
+                    scroll.x = 0;
+                }
+            } else {
+                scroll.x = 0;
+            }
+        }
+        
+        background1X = background1X + (scroll.x / paralaxSpeed.p1);
+        background2X = background2X + (scroll.x / paralaxSpeed.p2);
+        background3X = background3X + (scroll.x / paralaxSpeed.p2);
         this.y += this.yVel; 
+        this.x = this.x + scroll.x; 
+    
     }
     
-    
-    this.jump = function() {
-        this.jumping = true;
-        player.yVel += 1;
+    this.find_colided_platform = function() {
+        for (i = 0; i < platforms1.length; i++) {
+            if (this.platformTOPcol(platforms1[i].x, platforms1[i].y, platforms1[i].width, platforms1[i].height)) {
+                return i;
+            }
+        }
     }
     
     this.collisionAABB = function(px, py, pw, ph) {
@@ -278,12 +412,50 @@ var player = new function() {
     this.platformTOPcol = function(p1,p2,p3,p4) {
         if (this.collisionAABB(p1,p2,p3,p4) && 
             this.y + (this.width /4) <= p2) {
+            
             return true;
             
         } else {return false};
     }
     
+    this.groundCol = function() {
+        if (state = "l1") {
+            var p = platforms1;
+            if (this.platformTOPcol(p[0].x, p[0].y, p[0].width, p[0].height) ||
+                this.platformTOPcol(p[1].x, p[1].y, p[1].width, p[1].height)) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
+    
+    this.reset = function(start_posX, start_posY, p) {
+        
+        background1X = 0;
+        background2X = 0;
+        background3X = 0;
+
+        for (i = 0; i < p.length; i++) {
+            p[i].x = p[i].startPos;
+        }
+         
+        this.x = start_posX;
+        this.y = start_posY;
+        this.yVel = 0;
+        this.jumping = false;
+        this.deathDown = false;
+        this.grounded = false;
+        this.left = false;
+        this.right = false;
+        this.canJump = true;
+        this.dead = false;
+        this.state = "walk";
+        this.fCount = 0;
+    }
+    
 }
+
 var water = {
     fCount: 0,
 	images: [       
@@ -301,7 +473,7 @@ var water = {
                       x, 
                       y, 
                       510, 
-                      214);
+                      440); //214
         
         
         this.c += dt;
@@ -319,23 +491,30 @@ var water = {
 }
 
 class platform {
-    constructor(x_pos, y_pos, wid, hei, col) {
+    constructor(x_pos, y_pos, wid, hei, i) {
         this.x = x_pos;
         this.y = y_pos;
         this.width = wid;
         this.height = hei;
-        this.color = col;
+        this.img = i;
+        this.startPos = x_pos;
     }
     
     draw() {
-        ctx.fillStyle = this.color;
-        ctx.fillRect(this.x, this.y, this.width, this.height);
+        ctx.drawImage(this.img, 0, 38, 256, 70, 
+                      this.x,this.y,this.width,this.height);
+        
+        this.x = this.x + scroll.x;
     }
 }
 
-var platforms1 = [
-    new platform(0,800,c.width - 400,500,"blue"),
-];
+// X Y W H IMG
+var platforms1 = [new platform(0, 800, 1920, 500, platformsIMG),
+                  new platform(1920, 800, 6000, 500, platformsIMG)];
+
+//platform setup
+
+
 
 function DrawMenu() {
     //base
@@ -374,8 +553,26 @@ function DrawMenu() {
 	ctx.fillRect(0,0,500,c.height);
 	
 	//title
-	ctx.drawImage(titleIMG, 700,70,1000,500)
-	
+    if (menuZoom) {
+        menuPulse += 0.02;
+        
+        if (menuPulse > 2) {
+            menuPulse = 2;
+            menuZoom = false;
+        }
+    }
+    
+    
+    ctx.save()
+    ctx.translate(1250,300);
+    if (menuZoom) {
+        ctx.scale(Math.sin(menuPulse), Math.sin(menuPulse))
+    } else {
+        ctx.scale(Math.sin(menuPulse), Math.sin(menuPulse));
+    }
+	ctx.drawImage(titleIMG, -500,-250,1000,500)
+    ctx.restore();
+    
 	//buttons
 	drawButton(buttons.play);
 	drawButton(buttons.quit);
@@ -387,6 +584,9 @@ function DrawMenu() {
     ctx.drawImage(htpTextIMG, 150,420,500,100, 170, 530, 500, 100)
     ctx.drawImage(htpTextIMG, 20,540,500,100, 80, 665, 400, 90)
     ctx.imageSmoothingEnabled = false;
+    
+    //draw logo
+    ctx.drawImage(myLogo, c.width - 110, c.height - 100, 100,100);
     
     transisIn();
     transisOut();
@@ -500,16 +700,52 @@ function Level1() {
     ctx.fillStyle = "white";      
     ctx.fillRect(0, 0, c.width, c.height);
 
-    //paralax background 2
-    ctx.drawImage(backgroundIMG1, 0,0, 4488, c.height);
+    //paralax background 1
+    ctx.drawImage(BBG, background1X ,0, 1920, c.height);
+    ctx.drawImage(BBG, background1X + 1920 ,0, 1920, c.height);
+    ctx.drawImage(BBG, background1X + -1920 ,0, 1920, c.height);
+    
+    if (background1X <= -c.width) {
+        background1X = 0;
+    }
+    
+    if (background1X >= c.width) {
+        background1X = 0;
+    }
+    
+    //paralax background 1 //1122x88
+    ctx.drawImage(FBG, background2X ,215, 6144, 528);
+    ctx.drawImage(FBG, background2X + 6144,215, 6144, 528);
+    ctx.drawImage(FBG, background2X - 6144,215, 6144, 528);
+    
+    if (background2X <= -6144) {
+        background2X = 0;
+    }
+    
+    if (background2X >= 6144) {
+        background2X = 0;
+    }
     
     //paralax water
-    water.draw(0, 641);
-    water.draw(510, 641);
-    water.draw(1020, 641);
-    water.draw(1530, 641);
-    water.draw(2040, 641);
-        
+    water.draw(background3X - 510, 731)
+    water.draw(background3X, 731);
+    water.draw(background3X + 510, 731);
+    water.draw(background3X + 1020, 731);
+    water.draw(background3X + 1530, 731);
+    water.draw(background3X + 2040, 731);
+    //water.draw(background2X + 3040, 731);
+    //water.draw(background2X + 3550, 731);
+    //water.draw(background2X + 4060, 731);
+    //water.draw(background2X + 4570, 731);
+    
+    if (background3X <= -510) {
+        background3X = 0;
+    }
+    
+    if (background3X >= 510) {
+        background3X = 0;
+    }
+    
     //player
     player.draw();
     
@@ -519,6 +755,33 @@ function Level1() {
         platforms1[i].draw();
     }
     
+    
+    //dead
+    if (player.dead) {
+        player.fCount = 26;
+        player.state = "dead"
+        
+        if(player.y > 200 && !player.deathDown) {
+            if (Math.abs(player.yVel) < player.jumpHeight) {
+                player.yVel-= player.jumpSpeed;
+            }
+            
+            player.y += player.yVel;
+            
+            if (player.y <= 600) {
+                player.deathDown = true;
+            }
+        } else if (player.deathDown){
+            player.yVel+= player.gravity;
+            player.y += player.yVel;
+            
+            if (player.y - player.height / 2 > c.height) {
+                transisionOut.enabled = true;
+                transisionOut.state = "go";
+                transisOut();
+            }
+        }
+    }
     
 	transisIn();
     transisOut();
@@ -530,6 +793,118 @@ function Level2() {
     ctx.fillStyle = "green";      
     ctx.fillRect(0, 0, c.width, c.height);
 
+    transisIn();
+    transisOut();
+}
+
+function GameOverDraw() {
+    
+    //base
+    ctx.fillStyle = "green";      
+    ctx.fillRect(0, 0, c.width, c.height);
+
+    //base
+    ctx.fillStyle = "white";      
+    ctx.fillRect(0, 0, c.width, c.height);
+
+	//background
+	ctx.drawImage(backgroundImg, menuBackScrollX1, 0, c.width, c.height)
+	ctx.drawImage(backgroundImg, menuBackScrollX1 + c.width, 0, c.width, c.height)
+	
+    //ground
+    ctx.drawImage(platformsIMG, 0, 35, 256, 50, 
+                  menuBackScrollX2, c.height - 355, c.width, 355);
+    
+    ctx.drawImage(platformsIMG, 0, 35, 256, 50, 
+                  menuBackScrollX2 + c.width, c.height - 355, c.width, 355);
+    
+	//sonic
+	player.drawMenu();
+    
+    //move background
+    menuBackScrollX1 -= 1.15;
+    menuBackScrollX2 -= 2.3;
+    
+    
+    if (menuBackScrollX1 <= -c.width) {
+        menuBackScrollX1 = 0;
+    }
+    
+    if (menuBackScrollX2 <= -c.width) {
+        menuBackScrollX2 = 0;
+    }
+    
+    //grey back
+	ctx.fillStyle = "rgb(23,23,23,0.6)"
+	ctx.fillRect(0,c.height - 200, c.width,c.height);
+    
+    //buttons
+	drawButton(buttons.back);
+    
+    //game over
+    ctx.drawImage(goTitleIMG, (c.width / 2) - 756.5, (c.height / 2) - 200);//1513
+    
+    //button text
+    ctx.imageSmoothingEnabled = true;
+    ctx.drawImage(htpTextIMG, 700,0,630,120, c.width / 2 - 118, c.height - 165, 600, 120)
+    ctx.imageSmoothingEnabled = false;
+    
+    transisIn();
+    transisOut();
+}
+
+function YouWinDraw() {
+    
+    //base
+    ctx.fillStyle = "green";      
+    ctx.fillRect(0, 0, c.width, c.height);
+
+    //base
+    ctx.fillStyle = "white";      
+    ctx.fillRect(0, 0, c.width, c.height);
+
+	//background
+	ctx.drawImage(backgroundImg, menuBackScrollX1, 0, c.width, c.height)
+	ctx.drawImage(backgroundImg, menuBackScrollX1 + c.width, 0, c.width, c.height)
+	
+    //ground
+    ctx.drawImage(platformsIMG, 0, 35, 256, 50, 
+                  menuBackScrollX2, c.height - 355, c.width, 355);
+    
+    ctx.drawImage(platformsIMG, 0, 35, 256, 50, 
+                  menuBackScrollX2 + c.width, c.height - 355, c.width, 355);
+    
+	//sonic
+	player.drawMenu();
+    
+    //move background
+    menuBackScrollX1 -= 1.15;
+    menuBackScrollX2 -= 2.3;
+    
+    
+    if (menuBackScrollX1 <= -c.width) {
+        menuBackScrollX1 = 0;
+    }
+    
+    if (menuBackScrollX2 <= -c.width) {
+        menuBackScrollX2 = 0;
+    }
+    
+    //grey back
+	ctx.fillStyle = "rgb(23,23,23,0.6)"
+	ctx.fillRect(0,c.height - 200, c.width,c.height);
+    
+    //buttons
+	drawButton(buttons.back);
+    
+    //you win
+    ctx.drawImage(ywTitleIMG, (c.width / 2) - 756.5, (c.height / 2) - 200);//1513
+    
+    //button text
+    ctx.imageSmoothingEnabled = true;
+    ctx.drawImage(htpTextIMG, 700,0,630,120, c.width / 2 - 118, c.height - 165, 600, 120)
+    ctx.imageSmoothingEnabled = false;
+    
     transisIn();
     transisOut();
 }
@@ -546,33 +921,85 @@ function Level3() {
 
 function transisOut() {
     if (transisionOut.enabled) {
+        
+        ctx.save()
+        ctx.translate(c.width / 2, c.height / 2);
+        ctx.scale(transisionOut.x * 2,transisionOut.x * 2)
         ctx.fillStyle = transisionOut.color;
-        ctx.fillRect(0, 0, transisionOut.x, c.height)
+        ctx.beginPath();
+        ctx.ellipse(0, 0, 600, 600, 0, 0, 360, false);
+        ctx.fill();
+        ctx.restore();
+        
+        ctx.save()
+        ctx.translate(c.width / 2, c.height / 2);
+        ctx.scale(transisionOut.x,transisionOut.x)
+        ctx.drawImage(sonicFace, -596, - 486)
+        ctx.restore();
+        
+        
         
         transisionOut.x += transisionOut.speed;
         
-        if (transisionOut.x > c.width) {
+        if (transisionOut.x > 1) {
             transisionOut.enabled = false;
             state = transisionOut.state;
             transisionOut.state = null;
             transisionOut.x = 0;
             transisionIn.enabled = true;
         }
+        
+//        transisionOut.x += transisionOut.speed;
+//        
+//        if (transisionOut.x > c.width) {
+//            transisionOut.enabled = false;
+//            state = transisionOut.state;
+//            transisionOut.state = null;
+//            transisionOut.x = 0;
+//            transisionIn.enabled = true;
+//        }
     }
 }
 
 function transisIn() {
+    
+    
     if (transisionIn.enabled) {
+        ctx.save()
+        ctx.translate(c.width / 2, c.height / 2);
+        ctx.scale(transisionIn.x * 2,transisionIn.x * 2)
         ctx.fillStyle = transisionIn.color;
-        ctx.fillRect(transisionIn.x, 0, c.width, c.height)
+        ctx.beginPath();
+        ctx.ellipse(0, 0, 600, 600, 0, 0, 360, false);
+        ctx.fill();
+        ctx.restore();
         
-        transisionIn.x += transisionIn.speed;
+        ctx.save()
+        ctx.translate(c.width / 2, c.height / 2);
+        ctx.scale(transisionIn.x,transisionIn.x)
+        ctx.drawImage(sonicFace, -596, - 486)
+        ctx.restore();
         
-        if (transisionIn.x > c.width) {
+        transisionIn.x -= transisionIn.speed;
+        
+        if (transisionIn.x <= 0) {
             transisionIn.enabled = false;
-            transisionIn.x = 0;
+            transisionIn.x = 1;
         }
     }
+    
+    
+//    if (transisionIn.enabled) {
+//        ctx.fillStyle = transisionIn.color;
+//        ctx.fillRect(transisionIn.x, 0, c.width, c.height)
+//        
+//        transisionIn.x += transisionIn.speed;
+//        
+//        if (transisionIn.x > c.width) {
+//            transisionIn.enabled = false;
+//            transisionIn.x = 0;
+//        }
+//    }
 }
 
 function update(time = 0) {
@@ -617,7 +1044,9 @@ function update(time = 0) {
         
         case "l1":
             Level1();
-            player.move();
+            if (!player.dead) {
+                player.move();
+            }
             break;
         
         case "l2":
@@ -626,6 +1055,21 @@ function update(time = 0) {
             
         case "l3":
             Level3();
+            break;
+               
+        case "go":
+            GameOverDraw();
+            break; 
+            
+        case "yw":
+            YouWinDraw();
+            break;
+            
+        case "sprite":
+            ctx.fillStyle = "white";
+            ctx.fillRect(0,0,c.width, c.height);
+            
+            player.draw();
             break;
             
     }
@@ -733,6 +1177,14 @@ function handleMouseMove(event) {
 		case "htp":
             buttonHighlight(buttons.back, MouseX, MouseY);
 			break;
+	
+		case "go":
+            buttonHighlight(buttons.back, MouseX, MouseY);
+			break;
+
+		case "yw":
+            buttonHighlight(buttons.back, MouseX, MouseY);
+			break;
 
         case "l1":
             break;
@@ -753,6 +1205,34 @@ function MouseUp(event) {
 //INPUT
 document.addEventListener("keydown", event => {
     switch (state) {
+        case "menu":
+            if (event.keyCode == 32 || event.keyCode == 13) {
+                transisionOut.enabled = true;
+                transisionOut.state = "lselect";
+            }
+            break;
+        
+        case "htp":
+            if (event.keyCode == 32 || event.keyCode == 13) {
+                transisionOut.enabled = true;
+                transisionOut.state = "menu";
+            }
+            break;
+            
+        case "go":
+            if (event.keyCode == 32 || event.keyCode == 13) {
+                transisionOut.enabled = true;
+                transisionOut.state = "menu";
+            }
+            break;
+               
+        case "yw":
+            if (event.keyCode == 32 || event.keyCode == 13) {
+                transisionOut.enabled = true;
+                transisionOut.state = "menu";
+            }
+            break;
+            
         case "lselect":
             if (event.keyCode == 37 || event.keyCode == 65) {
                 //LEFT
@@ -787,18 +1267,21 @@ document.addEventListener("keydown", event => {
                 //SPACE Or Enter
                 switch (player.lSelectX) {
                     case 450:
+                        player.reset(500, 0, platforms1);
                         player.state = "idle";
                         transisionOut.state = "l1";
                         transisionOut.enabled = true;
                         break
                     
                     case 950:
+                        player.reset(0, 0);
                         player.state = "idle";
                         transisionOut.state = "l2";
                         transisionOut.enabled = true;
                         break
 
                     case 1460:
+                        player.reset(0, 0);
                         player.state = "idle";
                         transisionOut.state = "l3";
                         transisionOut.enabled = true;
@@ -809,31 +1292,85 @@ document.addEventListener("keydown", event => {
 
             break;
             
-        case "l1":
+        case "l1" || "l2" || "l3":
+            
+            if (event.keyCode == 32 || event.keyCode == 13 || event.keyCode == 38) {
+                //SPACE or Enter or UP
+                if (!player.jumping && player.canJump) {
+                    player.grounded = true;
+                    player.y-= 40;
+                    
+                }
+                
+                if (!player.jumping && player.grounded) {
+                    player.fCount = 21;
+                    player.state = "jump"
+                    player.canJump = false;
+                    player.jumping = true;
+                }
+                
+                break;
+            }
+            
             
             if ((event.keyCode == 37 || event.keyCode == 65) && !player.right) {
+                player.right = false;
+                
                 //LEFT
-                if (!player.left) {
-                    player.fCount = 12;
+                if (!player.left && player.grounded && !player.jumping) {
+                    player.fCount = 13;
+                    player.state = "walkL"
                 }
                 player.left = true;
-
-            }else if ((event.keyCode == 39 || event.keyCode == 68) && !player.left) {
+                
+                break;
+            } else if ((event.keyCode == 39 || event.keyCode == 68) && !player.left) {
                 //RIGHT
                 
-                if (!player.right) {
-                    player.fCount = 4;
+                player.left = false;
+                
+                if (!player.right && player.grounded && !player.jumping)  {
+                    player.fCount = 5;
+                    player.state = "walkR"
                 }
                 player.right = true;
             
-                
-            } else if (event.keyCode == 32 || event.keyCode == 13 || event.keyCode == 38) {
-                //SPACE Or Enter
-                if (!player.jump && player.grounded) {
-                    player.jump();
-                }
+                break;
             }
             
+        case "sprite":
+            switch (event.keyCode) {
+                case 49:
+                    player.fCount = 11
+                    break;
+                
+                case 50:
+                    player.fCount = 20
+                    break;
+                
+                case 51:
+                    player.fCount = 21
+                    break;
+                
+                case 52:
+                    player.fCount = 22
+                    break;
+                
+                case 53:
+                    player.fCount = 23
+                    break;
+                
+                case 54:
+                    player.fCount = 24
+                    break;
+                case 54:
+                    player.fCount = 25
+                    break;
+                
+                case 55:
+                    player.fCount = 26
+                    break;
+            }
             break;
             
     }    
@@ -877,7 +1414,7 @@ document.addEventListener("click", event => {
                 transisionOut.state = "lselect";
 		   }
 		   if (buttonClick(buttons.quit, MouseX, MouseY)) {
-
+               location.href = "../index.html";
 		   }
 		   if (buttonClick(buttons.HTP, MouseX, MouseY)) {
 				transisionOut.enabled = true;
@@ -887,6 +1424,20 @@ document.addEventListener("click", event => {
 		   break;
        
        case "htp":
+		   if (buttonClick(buttons.back, MouseX, MouseY)) {
+				transisionOut.enabled = true;
+                transisionOut.state = "menu";
+           }
+		   break;
+           
+       case "go":
+		   if (buttonClick(buttons.back, MouseX, MouseY)) {
+				transisionOut.enabled = true;
+                transisionOut.state = "menu";
+           }
+		   break;
+           
+       case "yw":
 		   if (buttonClick(buttons.back, MouseX, MouseY)) {
 				transisionOut.enabled = true;
                 transisionOut.state = "menu";
@@ -923,6 +1474,10 @@ function genRand(min, max, decimalPlaces) {
 //waterIMG src="images/waterSpriteSheet.png"
 
 //set onload event
+sFace.onload = function() {imgLoad();}
+myLogo.onload = function() {imgLoad();}
+BBG.onload = function() {imgLoad();}
+FBG.onload = function() {imgLoad();}
 lockIMG.onload = function() {imgLoad();}
 backgroundImg.onload = function() {imgLoad();}
 htpInfoIMG.onload = function() {imgLoad();}
@@ -930,7 +1485,6 @@ htpTextIMG.onload = function() {imgLoad();}
 titleIMG.onload = function() {imgLoad();}
 spritesheet.onload = function() {imgLoad();}
 gSpritesheet.onload = function() {imgLoad();}
-backgroundIMG1.onload = function() {imgLoad();}
 platformsIMG.onload = function() {imgLoad();}
 lsTitleIMG.onload = function() {imgLoad();}
 ywTitleIMG.onload = function() {imgLoad();}
@@ -938,6 +1492,10 @@ goTitleIMG.onload = function() {imgLoad();}
 waterIMG.onload = function() {imgLoad();}
 
 //set image source
+sFace.src = "images/sonicFace.png";
+myLogo.src = "../logo/favicon.png";
+BBG.src = "images/background1.png";
+FBG.src = "images/fbg.png";
 lockIMG.src = "images/lock.png";
 backgroundImg.src = "images/backbackgrdn.png";
 htpInfoIMG.src = "images/htpInfo.png";
@@ -945,26 +1503,42 @@ htpTextIMG.src = "images/htpText.png";
 titleIMG.src = "images/Logo.png";
 spritesheet.src = "images/spritesheet.png";
 gSpritesheet.src = "images/gSpritesheet.png";
-backgroundIMG1.src = "images/background2.png";
 platformsIMG.src = "images/platforms.png";
 lsTitleIMG.src = "images/LevelSelectTitle.png";
 ywTitleIMG.src = "images/YouWinTitle.png";
 goTitleIMG.src = "images/gameOverTitle.png";
 waterIMG.src = "images/waterSpriteSheet.png";
 
-var imgCount = 0, imgMax = 13;
+var imgCount = 0, imgMax = 16;
 function imgLoad() {
     imgCount++;
     if (imgCount == imgMax) {
-        state = "menu"
+        console.log("Loading Successfull")
+        state = "menu" ///MENU ON RELEASE
+//        player.width = 600;
+//        player.height = 700;
+//        player.fCount = 25
+//        player.x = (c.width / 2) - (player.width / 2) + 300;
+//        player.y = (c.height / 2) - (player.height / 2) + 300;
     }
 }
 
 window.setTimeout( function() {
+    
     if (imgCount !== imgMax) {
-        window.alert("Timeout: Client took too long to load.");
+        window.alert("Timeout: Client took too long to load assets.");
         location.reload();
     }
 }, 10000)
 
+window.onresize = resizeWindow; 
+
+function resizeWindow() {
+    var off = 0;
+    c.style.left = 0;
+    off = (window.innerWidth - c.clientWidth) / 2;
+    c.style.left = off + "px";
+}
+
+resizeWindow();
 update();
