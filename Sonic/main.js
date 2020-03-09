@@ -7,6 +7,8 @@ ctx.imageSmoothingEnabled = false;
 let lastTime = 0;
 var dt;
 
+var fs2 = document.getElementById("f2");
+var fs1 = document.getElementById("f1");
 var coinIMG = document.getElementById("cimg");
 var lvl1plants = document.getElementById("l1plants");
 var lvl1 = document.getElementById("l1");
@@ -40,8 +42,11 @@ var menuBackScrollX2 = 0;
 var ShowColisionBounds = false;
 var debug = false;
 var debug2 = false;
+var debugC = false;
+var debugCO = false;
 var itemAdder = {enabled: false, selected: 0};
 var fWalkSpeed = 10;
+var fsButton = {x: c.width - 160, y: 10, w: 150, h: 150, highlight: false}
 
 var scroll = {x: 0, 
               y: 0, 
@@ -331,7 +336,7 @@ var player = new function() {
         
         
         //platform collision - set grounded val
-        if (this.groundCol()) {
+        if (this.groundCol() && !debugC) {
             
             if (this.grounded) {
                 var t = this.find_colided_platform();
@@ -350,7 +355,9 @@ var player = new function() {
         
         
         //coin Colision
-        this.coinCol();
+        if (!debugCO) {
+            this.coinCol();
+        }
         
         
         
@@ -375,7 +382,7 @@ var player = new function() {
         }
         
         //dead
-        if (this.lvl.y < -1380) {
+        if ((this.lvl.y < -1380) && !debug) {
             scroll.x = 0;
             scroll.y = 0;
             this.yVel = 0;
@@ -861,6 +868,14 @@ function DrawMenu() {
     //draw logo
     ctx.drawImage(myLogo, c.width - 110, c.height - 100, 100,100);
     
+    //Fullscreen button
+    if (fsButton.highlight) {
+        ctx.drawImage(fs2, fsButton.x, fsButton.y, fsButton.w, fsButton.h);
+        
+    } else {
+        ctx.drawImage(fs1, fsButton.x, fsButton.y, fsButton.w, fsButton.h);
+    }
+    
     //development text
     ctx.fillStyle = "white";
     ctx.textAlign = "center";
@@ -979,8 +994,6 @@ function Level1() {
     ctx.fillStyle = "white";      
     ctx.fillRect(0, 0, c.width, c.height);
 
-    //DEBUG /////////////////////////////////////////////
-    //player.y = 0;
     
     //paralax background 1
     ctx.drawImage(BBG, background1X ,0, 1920, c.height);
@@ -1086,16 +1099,18 @@ function Level1() {
     ctx.textAlign = "left";
     ctx.fillText(player.coinCount, 140, 80);
     
+    
+    //DEBUG UI
     if (debug) {
         ctx.fillStyle = "rgba(0,0,0,0.5)";
-        ctx.fillRect(c.width - 15, 15, -500, 500);
+        ctx.fillRect(c.width - 10, 10, -500, 700);
         
         ctx.strokeStyle = "rgba(255,0,0,0.5)";
         ctx.lineWidth = "20";
         ctx.strokeRect(0,0,c.width, c.height);
         
         ctx.fillStyle = "white";
-        ctx.font = "50px roboto";
+        ctx.font = "40px roboto";
         ctx.textAlign = "right"
         
         ctx.fillText("P: Debug Screen", c.width - 20, 50);
@@ -1103,23 +1118,37 @@ function Level1() {
             ctx.fillStyle = "cyan";
         }
         ctx.fillText("O: Collision Boxes", c.width - 20, 100);
+        
+        
+        ctx.fillStyle = "white";
+        if (debugC) {
+            ctx.fillStyle = "cyan";
+        }
+        ctx.fillText("C: Collisions (Platform)", c.width - 20, 150);
+        
+        ctx.fillStyle = "white";
+        if (debugCO) {
+            ctx.fillStyle = "cyan";
+        }
+        ctx.fillText("V: Collisions (Coin)", c.width - 20, 200);
+        
         ctx.fillStyle = "white";
         if (debug2) {
             ctx.fillStyle = "cyan";
         }
-        ctx.fillText("I: Free Walk", c.width - 20, 150);
+        ctx.fillText("I: Free Walk", c.width - 20, 350);
         
         ctx.fillStyle = "white";
-        ctx.fillText("Free Walk Speed: " + fWalkSpeed, c.width - 20, 250);
-        ctx.fillText("> : +Speed", c.width - 20, 300);
-        ctx.fillText("< : -Speed", c.width - 20, 350);
+        ctx.fillText("Free Walk Speed: " + fWalkSpeed, c.width - 20, 400);
+        ctx.fillText("> : +Speed", c.width - 20, 450);
+        ctx.fillText("< : -Speed", c.width - 20, 500);
         
         if (itemAdder.enabled) {
             ctx.fillStyle = "cyan";
         }
-        ctx.fillText("U: Item Adder", c.width - 20, 450);
+        ctx.fillText("U: Item Adder", c.width - 20, 600);
         ctx.fillStyle = "white";
-        ctx.fillText("Y: Chance Item", c.width - 20, 500);
+        ctx.fillText("Y: Chance Item", c.width - 20, 650);
         
         
         
@@ -1522,10 +1551,11 @@ function handleMouseMove(event) {
     //BUTTON HIGHLIGHT
 	switch (state) {
 	   case "menu":
-		   buttonHighlight(buttons.play, MouseX, MouseY);
-		   buttonHighlight(buttons.quit, MouseX, MouseY);
-		   buttonHighlight(buttons.HTP, MouseX, MouseY);
-		   break;
+            buttonHighlight(buttons.play, MouseX, MouseY);
+            buttonHighlight(buttons.quit, MouseX, MouseY);
+            buttonHighlight(buttons.HTP, MouseX, MouseY);
+            buttonHighlight(fsButton, MouseX, MouseY);
+            break;
 			
 		case "lselect":
 			break;
@@ -1566,6 +1596,10 @@ document.addEventListener("keydown", event => {
             if (event.keyCode == 32 || event.keyCode == 13) {
                 transisionOut.enabled = true;
                 transisionOut.state = "lselect";
+            }else if (event.keyCode == 27) {
+                if (document.fullscreen) {
+                   document.exitFullscreen();
+               }
             }
             break;
         
@@ -1701,11 +1735,15 @@ document.addEventListener("keydown", event => {
                 break;
             }else if ((event.keyCode == 80)) {
                 debug = !debug;
+                ShowColisionBounds = true;
+                player.boundingBox = true;
                 
                 if (!debug) {
                     player.boundingBox = false;
                     ShowColisionBounds = false;
                     debug2 = false;
+                    debugC = false;
+                    debugCO = false;
                     itemAdder.enabled = false;
                     
                 }
@@ -1737,7 +1775,16 @@ document.addEventListener("keydown", event => {
                     itemAdder.selected = 0;
                 }
                 
-                console.log(itemAdder.selected)
+                break;
+            }else if (event.keyCode == 67 && debug) {
+                //RIGHT
+                debugC = !debugC;
+                
+                break;
+            }else if (event.keyCode == 86 && debug) {
+                //RIGHT
+                debugCO = !debugCO;
+                
                 break;
             }
             
@@ -1847,6 +1894,15 @@ document.addEventListener("click", event => {
                 transisionOut.state = "htp";
 		   }
 		   
+           if (buttonClick(fsButton, MouseX, MouseY)) {
+               if (document.fullscreen) {
+                   document.exitFullscreen();
+               } else {
+                   c.requestFullscreen();   
+               }
+               
+           }
+           
 		   break;
        
        case "htp":
@@ -1910,6 +1966,8 @@ function genRand(min, max, decimalPlaces) {
 //waterIMG src="images/waterSpriteSheet.png"
 
 //set onload event
+fs2.onload = function() {imgLoad();}
+fs1.onload = function() {imgLoad();}
 coinIMG.onload = function() {imgLoad();}
 lvl1plants.onload = function() {imgLoad();}
 lvl1.onload = function() {imgLoad();}
@@ -1931,6 +1989,8 @@ goTitleIMG.onload = function() {imgLoad();}
 waterIMG.onload = function() {imgLoad();}
 
 //set image source
+fs1.src = "images/f1.png";
+fs2.src = "images/f2.png";
 coinIMG.src = "images/coin.png";
 lvl1plants.src = "images/l1plants.png";
 lvl1.src = "images/l1.png";
@@ -1951,7 +2011,7 @@ ywTitleIMG.src = "images/YouWinTitle.png";
 goTitleIMG.src = "images/gameOverTitle.png";
 waterIMG.src = "images/waterSpriteSheet.png";
 
-var imgCount = 0, imgMax = 19;
+var imgCount = 0, imgMax = 21;
 function imgLoad() {
     imgCount++;
     if (imgCount == imgMax) {
