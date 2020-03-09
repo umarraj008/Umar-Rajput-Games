@@ -7,6 +7,7 @@ ctx.imageSmoothingEnabled = false;
 let lastTime = 0;
 var dt;
 
+var coinIMG = document.getElementById("cimg");
 var lvl1plants = document.getElementById("l1plants");
 var lvl1 = document.getElementById("l1");
 var sonicFace = document.getElementById("sFace");
@@ -37,6 +38,11 @@ var menuZoom = true;
 var menuBackScrollX1 = 0;
 var menuBackScrollX2 = 0;
 var ShowColisionBounds = false;
+var debug = false;
+var debug2 = false;
+var itemAdder = {enabled: false, selected: 0};
+var fWalkSpeed = 10;
+
 var scroll = {x: 0, 
               y: 0, 
               boundLeft: 400, 
@@ -104,7 +110,8 @@ var player = new function() {
     this.deathDown = false;
     this.boundingBox = false;
     this.lvl = {x: 0, y: -1080,};
-    
+    this.coinCount = 0;
+    this.coins = [];
     //animation
     this.state = "walk";
     this.fCount = 0;
@@ -165,6 +172,7 @@ var player = new function() {
         //col box
         if (this.boundingBox) {
             ctx.strokeStyle = "red"
+            ctx.lineWidth = "2";
             ctx.strokeRect(this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
         }
         
@@ -341,8 +349,13 @@ var player = new function() {
         }
         
         
+        //coin Colision
+        this.coinCol();
+        
+        
+        
         //gravity
-        if (!this.grounded && !this.jumping) {
+        if (!this.grounded && !this.jumping && !debug2) {
             if (this.yVel < 70) {
                 this.yVel += this.gravity;                
             }
@@ -427,6 +440,7 @@ var player = new function() {
             }
         }
         
+        
         this.lvl.x = this.lvl.x + scroll.x;
         this.lvl.y += scroll.y;
         background1X = background1X + (scroll.x / paralaxSpeed.p1);
@@ -506,6 +520,19 @@ var player = new function() {
         }
     }
     
+    this.coinCol = function() {
+        for (i = 0; i < this.coins.length; i++) {
+            if (this.collisionAABB(this.coins[i].x, this.coins[i].y, this.coins[i].width, this.coins[i].height)) {
+                this.coins.splice(i, 1);
+                this.coinCount++;
+                return;
+            }
+            
+        }
+        
+        return
+    }
+    
     this.wallColL = function() { //BLOCK WHEN MOVING TO LEFT
         if (state = "l1") {
             var w = walls1;
@@ -531,7 +558,7 @@ var player = new function() {
         }
     }
     
-    this.reset = function(start_posX, start_posY, p, w) {
+    this.reset = function(start_posX, start_posY, p, w, c) {
         
         background1X = 0;
         background2X = 0;
@@ -546,12 +573,51 @@ var player = new function() {
             w[i].x = w[i].startPosX;
             w[i].y = w[i].startPosY;
         }
+        
+        if (c == "c1") {
+            this.coins = [
+                new coin(96, 180 - 1080), 
+                new coin(0, 430), 
+                new coin(100 + 1000, 340), 
+                new coin(200 + 1000, 340), 
+                new coin(300 + 1000, 340), 
+                new coin(400 + 1000, 340), 
+                new coin(500 + 1000, 340), 
+                new coin(600 + 1000, 340), 
+                new coin(700 + 1000, 340), 
+                new coin(800 + 1000, 340), 
+                new coin(900 + 1000, 340), 
+                
+                new coin(100 + 1000, 440), 
+                new coin(200 + 1000, 440), 
+                new coin(300 + 1000, 440), 
+                new coin(400 + 1000, 440), 
+                new coin(500 + 1000, 440), 
+                new coin(600 + 1000, 440), 
+                new coin(700 + 1000, 440), 
+                new coin(800 + 1000, 440), 
+                new coin(900 + 1000, 440), 
+                
+                new coin(100 + 1000, 540), 
+                new coin(200 + 1000, 540), 
+                new coin(300 + 1000, 540), 
+                new coin(400 + 1000, 540), 
+                new coin(500 + 1000, 540), 
+                new coin(600 + 1000, 540), 
+                new coin(700 + 1000, 540), 
+                new coin(800 + 1000, 540), 
+                new coin(900 + 1000, 540), 
+                
+                
+            ];
+        }
          
         this.x = start_posX;
         this.y = start_posY;
         this.yVel = 0;
         this.jumping = false;
         this.lvl = {x: 0, y: -1080};
+        this.coinCount = 0;
         this.deathDown = false;
         this.grounded = false;
         this.left = false;
@@ -598,6 +664,81 @@ var water = {
     }
 }
 
+class coin {
+    constructor(x_pos, y_pos) {
+        this.x = x_pos;
+        this.y = y_pos;
+        this.width = 100;
+        this.height = 100;
+        this.startPosX = x_pos;
+        this.startPosY = y_pos;
+        this.fCount = 0;
+        this.images = [       
+            {x: 25, y: 3, w: 300, h: 299}, 
+            {x: 375, y: 3, w: 300, h: 299}, 
+            {x: 725, y: 3, w: 300, h: 299}, 
+            {x: 1075, y: 3, w: 300, h: 299},
+            {x: 1425, y: 3, w: 300, h: 299},
+            {x: 1775, y: 3, w: 300, h: 299},
+            {x: 2125, y: 3, w: 300, h: 299},
+            {x: 2475, y: 3, w: 300, h: 299},
+        ];
+        this.c = 0;
+    }
+    
+    draw() {
+        ctx.drawImage(coinIMG, 
+                      this.images[this.fCount].x, this.images[this.fCount].y, this.images[this.fCount].w, this.images[this.fCount].h, 
+
+                      this.x, 
+                      this.y, 
+                      this.width, 
+                      this.height); //214
+
+        if (ShowColisionBounds) {
+            ctx.strokeStyle = "red";
+            ctx.strokeRect(this.x, this.y, this.width, this.height);
+        }
+
+        this.x += scroll.x;
+        this.y += scroll.y;
+
+        this.c += dt;
+        if (this.c > 50) {
+            this.c = 0;
+            this.fCount++;
+
+            if (this.fCount > 7) {
+                this.fCount = 0;
+            }
+
+        }
+
+    }
+    
+    drawUI(x, y) {
+        ctx.drawImage(coinIMG, 
+                      this.images[this.fCount].x, this.images[this.fCount].y, this.images[this.fCount].w, this.images[this.fCount].h, 
+
+                      x, 
+                      y, 
+                      this.width, 
+                      this.height); //214
+        
+        this.c += dt;
+        if (this.c > 50) {
+            this.c = 0;
+            this.fCount++;
+
+            if (this.fCount > 7) {
+                this.fCount = 0;
+            }
+
+        }
+
+    }
+}
+
 class platform {
     constructor(x_pos, y_pos, wid, hei) {
         this.x = x_pos;
@@ -620,6 +761,7 @@ class platform {
         this.y = this.y + scroll.y;
     }
 }
+
 
 // X Y W H IMG
 var platforms1 = [
@@ -645,6 +787,7 @@ var walls1 = [
     new platform(6954, -620, 20, 1500),
     new platform(7374, -3000, 20, 3499),
 ];
+var UIc = new coin();
 
 function DrawMenu() {
     //base
@@ -904,6 +1047,11 @@ function Level1() {
         walls1[i].colisionMove();
     }
     
+    //coins
+    for (i = 0; i < player.coins.length; i++) {
+        player.coins[i].draw();
+    }
+    
     //dead
     if (player.dead) {
         player.fCount = 26;
@@ -928,6 +1076,67 @@ function Level1() {
                 transisOut();
             }
         }
+    }
+    
+    
+    //UI
+    UIc.drawUI(10,10);
+    ctx.fillStyle = "white";
+    ctx.font = "50px roboto";
+    ctx.textAlign = "left";
+    ctx.fillText(player.coinCount, 140, 80);
+    
+    if (debug) {
+        ctx.fillStyle = "rgba(0,0,0,0.5)";
+        ctx.fillRect(c.width - 15, 15, -500, 500);
+        
+        ctx.strokeStyle = "rgba(255,0,0,0.5)";
+        ctx.lineWidth = "20";
+        ctx.strokeRect(0,0,c.width, c.height);
+        
+        ctx.fillStyle = "white";
+        ctx.font = "50px roboto";
+        ctx.textAlign = "right"
+        
+        ctx.fillText("P: Debug Screen", c.width - 20, 50);
+        if (ShowColisionBounds) {
+            ctx.fillStyle = "cyan";
+        }
+        ctx.fillText("O: Collision Boxes", c.width - 20, 100);
+        ctx.fillStyle = "white";
+        if (debug2) {
+            ctx.fillStyle = "cyan";
+        }
+        ctx.fillText("I: Free Walk", c.width - 20, 150);
+        
+        ctx.fillStyle = "white";
+        ctx.fillText("Free Walk Speed: " + fWalkSpeed, c.width - 20, 250);
+        ctx.fillText("> : +Speed", c.width - 20, 300);
+        ctx.fillText("< : -Speed", c.width - 20, 350);
+        
+        if (itemAdder.enabled) {
+            ctx.fillStyle = "cyan";
+        }
+        ctx.fillText("U: Item Adder", c.width - 20, 450);
+        ctx.fillStyle = "white";
+        ctx.fillText("Y: Chance Item", c.width - 20, 500);
+        
+        
+        
+        //ITEM ADDER
+        if (itemAdder.enabled) {
+            switch (itemAdder.selected) {
+                case 0:
+                    ctx.drawImage(coinIMG, 
+                                  25, 3, 300, 299, 
+                                  MouseX - 50, MouseY - 50, 100, 100);
+                    break;
+
+                case 1:
+                    break;
+            }
+        }
+        
     }
     
 	transisIn();
@@ -1217,8 +1426,6 @@ function update(time = 0) {
         case "sprite":
             ctx.fillStyle = "white";
             ctx.fillRect(0,0,c.width, c.height);
-            
-            player.draw();
             break;
             
     }
@@ -1336,6 +1543,7 @@ function handleMouseMove(event) {
 			break;
 
         case "l1":
+            
             break;
 			
    }
@@ -1416,21 +1624,21 @@ document.addEventListener("keydown", event => {
                 //SPACE Or Enter
                 switch (player.lSelectX) {
                     case 450:
-                        player.reset(500, 0, platforms1, walls1);
+                        player.reset(500, 0, platforms1, walls1, "c1");
                         player.state = "idle";
                         transisionOut.state = "l1";
                         transisionOut.enabled = true;
                         break
                     
                     case 950:
-                        player.reset(0, 0);
+                        player.reset(500, 0, platforms2, walls2, "c2");
                         player.state = "idle";
                         transisionOut.state = "l2";
                         transisionOut.enabled = true;
                         break
 
                     case 1460:
-                        player.reset(0, 0);
+                        player.reset(500, 0, platforms3, walls3, "c3");
                         player.state = "idle";
                         transisionOut.state = "l3";
                         transisionOut.enabled = true;
@@ -1443,7 +1651,7 @@ document.addEventListener("keydown", event => {
             
         case "l1":
             
-            if (event.keyCode == 32 || event.keyCode == 13 || event.keyCode == 38) {
+            if ((event.keyCode == 32 || event.keyCode == 13 || event.keyCode == 38) && !debug2) {
                 //SPACE or Enter or UP
                 
                 if (!player.jumping && player.canJump) {
@@ -1464,7 +1672,7 @@ document.addEventListener("keydown", event => {
             }
             
             
-            if ((event.keyCode == 37 || event.keyCode == 65) && !player.right) {
+            if (((event.keyCode == 37 || event.keyCode == 65) && !player.right) && !debug2) {
                 player.right = false;
                 
                 //LEFT
@@ -1475,7 +1683,7 @@ document.addEventListener("keydown", event => {
                 player.left = true;
                 
                 break;
-            } else if ((event.keyCode == 39 || event.keyCode == 68) && !player.left) {
+            } else if (((event.keyCode == 39 || event.keyCode == 68) && !player.left) && !debug2) {
                 //RIGHT
                 
                 player.left = false;
@@ -1487,11 +1695,74 @@ document.addEventListener("keydown", event => {
                 player.right = true;
             
                 break;
-            }else if ((event.keyCode == 79)) {
+            }else if ((event.keyCode == 79) && debug) {
                 player.boundingBox = !player.boundingBox;
                 ShowColisionBounds = !ShowColisionBounds;
                 break;
+            }else if ((event.keyCode == 80)) {
+                debug = !debug;
+                
+                if (!debug) {
+                    player.boundingBox = false;
+                    ShowColisionBounds = false;
+                    debug2 = false;
+                    itemAdder.enabled = false;
+                    
+                }
+                
+                break;
+            }else if ((event.keyCode == 73) && debug) {
+                debug2 = !debug2;
+                
+                break;
+            }else if (event.keyCode == 188 && debug) {
+                //RIGHT
+                fWalkSpeed--;
+                break;
+            }else if (event.keyCode == 190 && debug) {
+                //RIGHT
+                fWalkSpeed++;
+                break;
+            }else if (event.keyCode == 85 && debug) {
+                //RIGHT
+                itemAdder.enabled = !itemAdder.enabled;
+                break;
+            }else if (event.keyCode == 89 && debug && itemAdder.enabled) {
+                //RIGHT
+                
+                if (itemAdder.selected < 0) {
+                    itemAdder.selected++;
+                    
+                } else {
+                    itemAdder.selected = 0;
+                }
+                
+                console.log(itemAdder.selected)
+                break;
             }
+            
+            //debug
+            if (debug2) {
+                if (event.keyCode == 38 || event.keyCode == 87) {
+                    // UP
+                    player.y-= fWalkSpeed;
+
+                    break;
+                } else if (event.keyCode == 37 || event.keyCode == 65) {
+                    player.x-= fWalkSpeed;
+                    break;
+                } else if (event.keyCode == 39 || event.keyCode == 68) {
+                    //RIGHT
+                    player.x+= fWalkSpeed;
+                    break;
+                }else if (event.keyCode == 40 || event.keyCode == 83) {
+                    //RIGHT
+                    player.y+= fWalkSpeed;
+                    break;
+                }
+            }
+            
+            break;
             
         case "sprite":
             switch (event.keyCode) {
@@ -1598,6 +1869,16 @@ document.addEventListener("click", event => {
                 transisionOut.state = "menu";
            }
 		   break;
+           
+       case "l1":
+           if (itemAdder.enabled) {
+               switch (itemAdder.selected) {
+                   case 0:
+                       player.coins.push(new coin(MouseX - 50, MouseY - 50))
+                       break;
+               }
+           }
+           break;
    }
 });
 
@@ -1629,6 +1910,7 @@ function genRand(min, max, decimalPlaces) {
 //waterIMG src="images/waterSpriteSheet.png"
 
 //set onload event
+coinIMG.onload = function() {imgLoad();}
 lvl1plants.onload = function() {imgLoad();}
 lvl1.onload = function() {imgLoad();}
 sFace.onload = function() {imgLoad();}
@@ -1649,6 +1931,7 @@ goTitleIMG.onload = function() {imgLoad();}
 waterIMG.onload = function() {imgLoad();}
 
 //set image source
+coinIMG.src = "images/coin.png";
 lvl1plants.src = "images/l1plants.png";
 lvl1.src = "images/l1.png";
 sFace.src = "images/sonicFace.png";
@@ -1668,7 +1951,7 @@ ywTitleIMG.src = "images/YouWinTitle.png";
 goTitleIMG.src = "images/gameOverTitle.png";
 waterIMG.src = "images/waterSpriteSheet.png";
 
-var imgCount = 0, imgMax = 18;
+var imgCount = 0, imgMax = 19;
 function imgLoad() {
     imgCount++;
     if (imgCount == imgMax) {
@@ -1685,7 +1968,6 @@ function imgLoad() {
 window.setTimeout( function() {
     
     if (imgCount !== imgMax) {
-        window.alert("Timeout: Client took too long to load assets.");
         location.reload();
     }
 }, 10000)
