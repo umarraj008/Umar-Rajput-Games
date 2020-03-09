@@ -349,7 +349,7 @@ var player = new function() {
         } else if (this.grounded) {
             this.yVel = 0;
         }
-        
+    
         
         //jumping
         if (this.jumping) {
@@ -1445,10 +1445,12 @@ document.addEventListener("keydown", event => {
             
             if (event.keyCode == 32 || event.keyCode == 13 || event.keyCode == 38) {
                 //SPACE or Enter or UP
+                
                 if (!player.jumping && player.canJump) {
-                    player.grounded = true;
-                    player.y-= 40;
-                    
+                    if (player.groundCol()) {
+                        player.grounded = true;
+                        player.y-= 50;
+                    }
                 }
                 
                 if (!player.jumping && player.grounded) {
