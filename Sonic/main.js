@@ -7,6 +7,8 @@ ctx.imageSmoothingEnabled = false;
 let lastTime = 0;
 var dt;
 
+var lvl1plants = document.getElementById("l1plants");
+var lvl1 = document.getElementById("l1");
 var sonicFace = document.getElementById("sFace");
 var myLogo = document.getElementById("ml");
 var BBG = document.getElementById("bbg");
@@ -34,7 +36,17 @@ var menuPulse = 0;
 var menuZoom = true;
 var menuBackScrollX1 = 0;
 var menuBackScrollX2 = 0;
-var scroll = {x: 0, y: 0, boundLeft: 400, boundRight: 1100, smoothing: 0.5, speed: 15};
+var ShowColisionBounds = false;
+var scroll = {x: 0, 
+              y: 0, 
+              boundLeft: 400, 
+              boundRight: 1100, 
+              boundBottom: c.height - 200, 
+              boundTop: 150, 
+              smoothing: 0.5, 
+              speed: 15,
+              speed2: 20,
+             };
 
 var loadingCircleR = 0;
 
@@ -73,7 +85,7 @@ var player = new function() {
     
     //game
     this.x = 500;
-    this.y = 0;
+    this.y = 700;
     this.yVel = 0;
     this.jumping = false;
     this.jumpHeight = 30;
@@ -91,6 +103,7 @@ var player = new function() {
     this.dead = false;
     this.deathDown = false;
     this.boundingBox = false;
+    this.lvl = {x: 0, y: -1080,};
     
     //animation
     this.state = "walk";
@@ -200,7 +213,7 @@ var player = new function() {
                     this.fCount++;
 
                     if (this.fCount > 25) { //19 12
-                        this.fCount = 25;
+                        this.fCount = 22;
                     }
                 }
                 break;
@@ -288,14 +301,14 @@ var player = new function() {
     this.move = function() {
         
         //player move left right
-        if (this.left) {
+        if (this.left && !this.wallColL()) {
             if (this.grounded && !this.jumping) {
                 this.state = "walkL";
             }
             
             this.x-= this.speed;
         
-        } else if (this.right) {
+        } else if (this.right && !this.wallColR()) {
             if (this.grounded && !this.jumping) {
                 this.state = "walkR";
             }
@@ -312,11 +325,11 @@ var player = new function() {
         //platform collision - set grounded val
         if (this.groundCol()) {
             
-            if (!this.grounded) {
+            if (this.grounded) {
                 var t = this.find_colided_platform();
 
-                if (this.y + this.height / 2 > platforms1[t].y) {
-                    this.y -= ((this.y + (this.height / 2)) - platforms1[t].y);
+                if (this.y + this.height > platforms1[t].y) {
+                    this.y -= ((this.y + this.height / 2) - platforms1[t].y);
                 }
             }
             
@@ -330,7 +343,9 @@ var player = new function() {
         
         //gravity
         if (!this.grounded && !this.jumping) {
-            this.yVel += this.gravity;
+            if (this.yVel < 70) {
+                this.yVel += this.gravity;                
+            }
         } else if (this.grounded) {
             this.yVel = 0;
         }
@@ -347,8 +362,9 @@ var player = new function() {
         }
         
         //dead
-        if ((this.y - this.height / 2) > c.width) {
+        if (this.lvl.y < -1380) {
             scroll.x = 0;
+            scroll.y = 0;
             this.yVel = 0;
             this.right = false;
             this.left = false;
@@ -360,6 +376,7 @@ var player = new function() {
         
         
         //camera scroll
+        //left right
         if (player.x > scroll.boundRight) {
             if(Math.abs(scroll.x) < scroll.speed) {
                 scroll.x -= 2;
@@ -384,12 +401,41 @@ var player = new function() {
             }
         }
         
+        //up down
+        if ((player.y < scroll.boundTop)) {
+            if(Math.abs(scroll.y) < scroll.speed) {
+                scroll.y += 2;
+            }
+        } else if ((player.y > scroll.boundBottom)) {
+            if(Math.abs(scroll.y) < scroll.speed) {
+                //player.y -= 100;
+                scroll.y -= 3;
+            }
+        } else {
+            if (Math.abs(scroll.y) > 0) {
+                if (scroll.y > 0) {
+                    scroll.y -= scroll.smoothing;
+                } else {
+                    scroll.y += scroll.smoothing;
+                }
+
+                if (Math.abs(scroll.y) <= 0.3) {
+                    scroll.y = 0;
+                }
+            } else {
+                scroll.y = 0;
+            }
+        }
+        
+        this.lvl.x = this.lvl.x + scroll.x;
+        this.lvl.y += scroll.y;
         background1X = background1X + (scroll.x / paralaxSpeed.p1);
         background2X = background2X + (scroll.x / paralaxSpeed.p2);
         background3X = background3X + (scroll.x / paralaxSpeed.p2);
         this.y += this.yVel; 
         this.x = this.x + scroll.x; 
-    
+        this.y = this.y + scroll.y; 
+        
     }
     
     this.find_colided_platform = function() {
@@ -411,7 +457,25 @@ var player = new function() {
     
     this.platformTOPcol = function(p1,p2,p3,p4) {
         if (this.collisionAABB(p1,p2,p3,p4) && 
-            this.y + (this.width /4) <= p2) {
+            this.y + this.height >= p2) {
+            
+            return true;
+            
+        } else {return false};
+    }
+    
+    this.wallColDetectR = function(p1,p2,p3,p4) {
+        if (this.collisionAABB(p1,p2,p3,p4) && 
+            this.x + (this.width / 2) >= p1) {
+            
+            return true;
+            
+        } else {return false};
+    }
+    
+    this.wallColDetectL = function(p1,p2,p3,p4) {
+        if (this.collisionAABB(p1,p2,p3,p4) && 
+            this.x <= p1 + p3) {
             
             return true;
             
@@ -422,7 +486,19 @@ var player = new function() {
         if (state = "l1") {
             var p = platforms1;
             if (this.platformTOPcol(p[0].x, p[0].y, p[0].width, p[0].height) ||
-                this.platformTOPcol(p[1].x, p[1].y, p[1].width, p[1].height)) {
+                this.platformTOPcol(p[1].x, p[1].y, p[1].width, p[1].height) ||
+                this.platformTOPcol(p[2].x, p[2].y, p[2].width, p[2].height) ||
+                this.platformTOPcol(p[3].x, p[3].y, p[3].width, p[3].height) ||
+                this.platformTOPcol(p[4].x, p[4].y, p[4].width, p[4].height) ||
+                this.platformTOPcol(p[5].x, p[5].y, p[5].width, p[5].height) ||
+                this.platformTOPcol(p[6].x, p[6].y, p[6].width, p[6].height) ||
+                this.platformTOPcol(p[7].x, p[7].y, p[7].width, p[7].height) ||
+                this.platformTOPcol(p[8].x, p[8].y, p[8].width, p[8].height) ||
+                this.platformTOPcol(p[9].x, p[9].y, p[9].width, p[9].height) ||
+                this.platformTOPcol(p[10].x, p[10].y, p[10].width, p[10].height) ||
+                this.platformTOPcol(p[11].x, p[11].y, p[11].width, p[11].height) ||
+                this.platformTOPcol(p[12].x, p[12].y, p[12].width, p[12].height) ||
+                this.platformTOPcol(p[13].x, p[13].y, p[13].width, p[13].height)) {
                 return true;
             } else {
                 return false;
@@ -430,20 +506,52 @@ var player = new function() {
         }
     }
     
-    this.reset = function(start_posX, start_posY, p) {
+    this.wallColL = function() { //BLOCK WHEN MOVING TO LEFT
+        if (state = "l1") {
+            var w = walls1;
+            if (this.wallColDetectL(w[0].x, w[0].y, w[0].width, w[0].height) ||
+                this.wallColDetectL(w[3].x, w[3].y, w[3].width, w[3].height)) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
+    
+    this.wallColR = function() { //BLOCK WHEN MOVING TO RIGHT
+        if (state = "l1") {
+            var w = walls1;
+            if (this.wallColDetectL(w[1].x, w[1].y, w[1].width, w[1].height) ||
+                this.wallColDetectL(w[2].x, w[2].y, w[2].width, w[2].height) ||
+                this.wallColDetectL(w[4].x, w[4].y, w[4].width, w[4].height)) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
+    
+    this.reset = function(start_posX, start_posY, p, w) {
         
         background1X = 0;
         background2X = 0;
         background3X = 0;
 
         for (i = 0; i < p.length; i++) {
-            p[i].x = p[i].startPos;
+            p[i].x = p[i].startPosX;
+            p[i].y = p[i].startPosY;
+        }
+        
+        for (i = 0; i < w.length; i++) {
+            w[i].x = w[i].startPosX;
+            w[i].y = w[i].startPosY;
         }
          
         this.x = start_posX;
         this.y = start_posY;
         this.yVel = 0;
         this.jumping = false;
+        this.lvl = {x: 0, y: -1080};
         this.deathDown = false;
         this.grounded = false;
         this.left = false;
@@ -491,30 +599,52 @@ var water = {
 }
 
 class platform {
-    constructor(x_pos, y_pos, wid, hei, i) {
+    constructor(x_pos, y_pos, wid, hei) {
         this.x = x_pos;
         this.y = y_pos;
         this.width = wid;
         this.height = hei;
-        this.img = i;
-        this.startPos = x_pos;
+        this.startPosX = x_pos;
+        this.startPosY = y_pos;
     }
     
-    draw() {
-        ctx.drawImage(this.img, 0, 38, 256, 70, 
-                      this.x,this.y,this.width,this.height);
+    colisionMove() {
+        if (ShowColisionBounds) {
+
+            ctx.strokeStyle = "red";
+            ctx.lineWidth = "5";
+            ctx.strokeRect(this.x, this.y, this.width, this.height);
+        }
         
         this.x = this.x + scroll.x;
+        this.y = this.y + scroll.y;
     }
 }
 
 // X Y W H IMG
-var platforms1 = [new platform(0, 800, 1920, 500, platformsIMG),
-                  new platform(1920, 800, 6000, 500, platformsIMG)];
-
-//platform setup
-
-
+var platforms1 = [
+    new platform(0, 552, 1024, 500), //0, 408, 256, 17 // 0, 1632, 1024, 68
+    new platform(1024, 680, 1024, 500),
+    new platform(2505, 398, 883, 30),
+    new platform(3902, 636, 1024, 500),
+    new platform(4925, 458, 1024, 500),
+    new platform(5950, -620, 1024, 100),
+    new platform(6974, 894, 1024, 1500),
+    new platform(5124, 0, 238, 30),
+    new platform(5720, -354, 238, 30),
+    new platform(5120, -764, 238, 30),
+    new platform(3046, -803, 1649, 30),
+    new platform(2219, -803, 241, 30),
+    new platform(1424, -803, 241, 30),
+    new platform(0, -803, 882, 30),
+];
+var walls1 = [
+    new platform(1004, 552, 20, 1024),
+    new platform(4925, 458, 20, 290),
+    new platform(5948, -620, 20, 1200),
+    new platform(6954, -620, 20, 1500),
+    new platform(7374, -3000, 20, 3499),
+];
 
 function DrawMenu() {
     //base
@@ -587,6 +717,12 @@ function DrawMenu() {
     
     //draw logo
     ctx.drawImage(myLogo, c.width - 110, c.height - 100, 100,100);
+    
+    //development text
+    ctx.fillStyle = "white";
+    ctx.textAlign = "center";
+    ctx.font = "30px roboto";
+    ctx.fillText("Game is Still in Development", c.width / 2, c.height - 30)
     
     transisIn();
     transisOut();
@@ -700,6 +836,9 @@ function Level1() {
     ctx.fillStyle = "white";      
     ctx.fillRect(0, 0, c.width, c.height);
 
+    //DEBUG /////////////////////////////////////////////
+    //player.y = 0;
+    
     //paralax background 1
     ctx.drawImage(BBG, background1X ,0, 1920, c.height);
     ctx.drawImage(BBG, background1X + 1920 ,0, 1920, c.height);
@@ -746,15 +885,24 @@ function Level1() {
         background3X = 0;
     }
     
+    //plants
+    ctx.drawImage(l1plants, player.lvl.x, player.lvl.y, 8000, 2160);
+    
     //player
     player.draw();
     
+    //level
+    ctx.drawImage(l1, player.lvl.x, player.lvl.y, 8000, 2160);
     
     //platforms
     for (i = 0; i < platforms1.length; i++) {
-        platforms1[i].draw();
+        platforms1[i].colisionMove();
     }
-    
+     
+    //walls
+    for (i = 0; i < walls1.length; i++) {
+        walls1[i].colisionMove();
+    }
     
     //dead
     if (player.dead) {
@@ -774,7 +922,6 @@ function Level1() {
         } else if (player.deathDown){
             player.yVel+= player.gravity;
             player.y += player.yVel;
-            
             if (player.y - player.height / 2 > c.height) {
                 transisionOut.enabled = true;
                 transisionOut.state = "go";
@@ -793,6 +940,8 @@ function Level2() {
     ctx.fillStyle = "green";      
     ctx.fillRect(0, 0, c.width, c.height);
 
+    ctx.drawImage(lvl1, 0, 0);
+    
     transisIn();
     transisOut();
 }
@@ -1267,7 +1416,7 @@ document.addEventListener("keydown", event => {
                 //SPACE Or Enter
                 switch (player.lSelectX) {
                     case 450:
-                        player.reset(500, 0, platforms1);
+                        player.reset(500, 0, platforms1, walls1);
                         player.state = "idle";
                         transisionOut.state = "l1";
                         transisionOut.enabled = true;
@@ -1292,7 +1441,7 @@ document.addEventListener("keydown", event => {
 
             break;
             
-        case "l1" || "l2" || "l3":
+        case "l1":
             
             if (event.keyCode == 32 || event.keyCode == 13 || event.keyCode == 38) {
                 //SPACE or Enter or UP
@@ -1335,6 +1484,10 @@ document.addEventListener("keydown", event => {
                 }
                 player.right = true;
             
+                break;
+            }else if ((event.keyCode == 79)) {
+                player.boundingBox = !player.boundingBox;
+                ShowColisionBounds = !ShowColisionBounds;
                 break;
             }
             
@@ -1474,6 +1627,8 @@ function genRand(min, max, decimalPlaces) {
 //waterIMG src="images/waterSpriteSheet.png"
 
 //set onload event
+lvl1plants.onload = function() {imgLoad();}
+lvl1.onload = function() {imgLoad();}
 sFace.onload = function() {imgLoad();}
 myLogo.onload = function() {imgLoad();}
 BBG.onload = function() {imgLoad();}
@@ -1492,6 +1647,8 @@ goTitleIMG.onload = function() {imgLoad();}
 waterIMG.onload = function() {imgLoad();}
 
 //set image source
+lvl1plants.src = "images/l1plants.png";
+lvl1.src = "images/l1.png";
 sFace.src = "images/sonicFace.png";
 myLogo.src = "../logo/favicon.png";
 BBG.src = "images/background1.png";
@@ -1509,7 +1666,7 @@ ywTitleIMG.src = "images/YouWinTitle.png";
 goTitleIMG.src = "images/gameOverTitle.png";
 waterIMG.src = "images/waterSpriteSheet.png";
 
-var imgCount = 0, imgMax = 16;
+var imgCount = 0, imgMax = 18;
 function imgLoad() {
     imgCount++;
     if (imgCount == imgMax) {
