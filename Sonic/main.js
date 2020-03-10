@@ -1752,6 +1752,10 @@ document.addEventListener("keydown", event => {
             }else if ((event.keyCode == 73) && debug) {
                 debug2 = !debug2;
                 
+                if (debug2) {
+                    player.state = "idle";
+                    player.yVel = 0;
+                }
                 break;
             }else if (event.keyCode == 188 && debug) {
                 //RIGHT
