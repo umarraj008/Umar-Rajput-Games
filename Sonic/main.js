@@ -7,6 +7,7 @@ ctx.imageSmoothingEnabled = false;
 let lastTime = 0;
 var dt;
 
+var enemy1IMG = document.getElementById("e1");
 var fs2 = document.getElementById("f2");
 var fs1 = document.getElementById("f1");
 var coinIMG = document.getElementById("cimg");
@@ -44,9 +45,13 @@ var debug = false;
 var debug2 = false;
 var debugC = false;
 var debugCO = false;
-var itemAdder = {enabled: false, selected: 0};
+var debugEO = false;
+var itemAdder = {enabled: false, selected: 0, name: "Coin"};
 var fWalkSpeed = 10;
 var fsButton = {x: c.width - 160, y: 10, w: 150, h: 150, highlight: false}
+var cBars = {x: 0, y: 0};
+var cutsceneTrigger = false;
+var door = {x: 0, y: 0};
 
 var scroll = {x: 0, 
               y: 0, 
@@ -98,6 +103,7 @@ var player = new function() {
     this.x = 500;
     this.y = 700;
     this.yVel = 0;
+    this.xVel = 0;
     this.jumping = false;
     this.jumpHeight = 30;
     this.jumpSpeed = 10;
@@ -111,12 +117,15 @@ var player = new function() {
     //this.width = 600;
     //this.height = 700;
     this.canJump = true;
+    this.dLeft = false;
     this.dead = false;
+    this.isDamaged = false;
     this.deathDown = false;
     this.boundingBox = false;
     this.lvl = {x: 0, y: -1080,};
     this.coinCount = 0;
     this.coins = [];
+    this.enemies = [];
     //animation
     this.state = "walk";
     this.fCount = 0;
@@ -157,6 +166,9 @@ var player = new function() {
         
         //dead
         {x: 219, y: 906, w: 33, h: 40}, //26
+        
+        //damaged
+        {x: 128, y: 909, w: 38, h: 40}, //27
         
     ]
     this.c = 0;
@@ -241,6 +253,18 @@ var player = new function() {
                         this.fCount = 26;
                     }
                 }
+                break;    
+                
+            case "damage":
+                this.c += dt;
+                if (this.c > 50) {
+                    this.c = 0;
+                    this.fCount++;
+
+                    if (this.fCount > 27) { //19 12
+                        this.fCount = 27;
+                    }
+                }
                 break;
         }
 
@@ -314,15 +338,15 @@ var player = new function() {
     this.move = function() {
         
         //player move left right
-        if (this.left && !this.wallColL()) {
-            if (this.grounded && !this.jumping) {
+        if (this.left && !this.wallCol().left) {
+            if (this.grounded && !this.jumping && !this.isDamaged && this.state != "damage") {
                 this.state = "walkL";
             }
             
             this.x-= this.speed;
         
-        } else if (this.right && !this.wallColR()) {
-            if (this.grounded && !this.jumping) {
+        } else if (this.right && !this.wallCol().right) {
+            if (this.grounded && !this.jumping && !this.isDamaged && this.state != "damage") {
                 this.state = "walkR";
             }
             
@@ -330,7 +354,7 @@ var player = new function() {
         
         }
         
-        if (!this.right && !this.left && this.grounded && !this.jumping) {
+        if (!this.right && !this.left && this.grounded && !this.jumping && this.state != "damage") {
             this.state = "idle"
         }
         
@@ -359,6 +383,28 @@ var player = new function() {
             this.coinCol();
         }
         
+        //Enemy
+        if (!debugEO) {
+            if (!this.isDamaged && this.state != "damage") {
+                this.EnemyCol()  
+            }
+            
+            this.EnemyColDamage();
+        }
+        
+        //damaged
+        if (this.isDamaged) {
+            this.grounded = false;
+            this.yVel -= this.jumpSpeed;
+            if (!this.dLeft) {
+                this.xVel -= (this.jumpSpeed / 2);
+            } else {
+                this.xVel += (this.jumpSpeed / 3);
+            }
+            if ((Math.abs(this.xVel) > (this.jumpHeight)) || (Math.abs(this.yVel) > this.jumpHeight)) {
+                this.isDamaged = false;
+            }
+        }
         
         
         //gravity
@@ -367,7 +413,11 @@ var player = new function() {
                 this.yVel += this.gravity;                
             }
         } else if (this.grounded) {
+            if (this.state == "damage") {
+                this.state = "idle"
+            }
             this.yVel = 0;
+            this.xVel = 0;
         }
     
         
@@ -447,6 +497,21 @@ var player = new function() {
             }
         }
         
+//        if (!this.isDamaged) {
+//            if (Math.abs(this.xVel) > 0) {
+//
+//                if (Math.abs(this.xVel > 0)) {
+//                    this.xVel -= this.gravity;                
+//                } else {
+//                    this.xVel += this.gravity;                
+//
+//                } 
+//            } else {
+//                if (Math.abs(this.xVel) < 1) {
+//                    this.xVel = 0;
+//                }
+//            }
+//        }
         
         this.lvl.x = this.lvl.x + scroll.x;
         this.lvl.y += scroll.y;
@@ -454,6 +519,7 @@ var player = new function() {
         background2X = background2X + (scroll.x / paralaxSpeed.p2);
         background3X = background3X + (scroll.x / paralaxSpeed.p2);
         this.y += this.yVel; 
+        this.x += this.xVel; 
         this.x = this.x + scroll.x; 
         this.y = this.y + scroll.y; 
         
@@ -476,6 +542,15 @@ var player = new function() {
         } else {return false};
     }
     
+    this.collisionAABB2 = function(px, py, pw, ph) {
+        if (this.x - (this.width / 2) < px + (pw / 2) &&
+            this.x + (this.width / 2) > px &&
+            this.y - (this.height / 2) < py + (ph / 2) &&
+            this.y + (this.height / 2) > py) {
+            return true;
+        } else {return false};
+    }
+    
     this.platformTOPcol = function(p1,p2,p3,p4) {
         if (this.collisionAABB(p1,p2,p3,p4) && 
             this.y + this.height >= p2) {
@@ -485,22 +560,24 @@ var player = new function() {
         } else {return false};
     }
     
-    this.wallColDetectR = function(p1,p2,p3,p4) {
+    this.wallColDetect = function(p1,p2,p3,p4) {
+        var t = {l: false, r: false};
         if (this.collisionAABB(p1,p2,p3,p4) && 
             this.x + (this.width / 2) >= p1) {
+            this.x--;
+            t.l = true;
             
-            return true;
-            
-        } else {return false};
-    }
-    
-    this.wallColDetectL = function(p1,p2,p3,p4) {
+        }
+        
         if (this.collisionAABB(p1,p2,p3,p4) && 
-            this.x <= p1 + p3) {
+            this.x - (this.width / 2) <= p1 + p3) {
+            this.x++;
+            t.r = true;
             
-            return true;
-            
-        } else {return false};
+        }
+        
+        return t;
+        
     }
     
     this.groundCol = function() {
@@ -540,32 +617,70 @@ var player = new function() {
         return
     }
     
-    this.wallColL = function() { //BLOCK WHEN MOVING TO LEFT
+    this.EnemyCol = function() {
+        for (i = 0; i < this.enemies.length; i++) {
+            if (this.collisionAABB((this.enemies[i].x - this.enemies[i].width / 2), (this.enemies[i].y - this.enemies[i].height / 2), this.enemies[i].width, this.enemies[i].height) && (this.state == "jump" || this.jumping)) {
+                if (!this.enemies[i].dead) {
+                    //this.jumping = true;
+                }
+                this.enemies[i].ind = i;
+                this.enemies[i].dead = true;
+                this.enemies[i].state = "dead";
+                return true;
+            }
+            
+        }
+        
+        return false;
+    }
+    
+    this.EnemyColDamage = function() {
+        for (i = 0; i < this.enemies.length; i++) {
+                if (this.collisionAABB((this.enemies[i].x - this.enemies[i].width / 2), (this.enemies[i].y - this.enemies[i].height / 2), this.enemies[i].width, this.enemies[i].height) && (this.state != "jump" && !this.jumping) && !this.enemies[i].dead) {
+                    
+                    this.dLeft = false;
+                    
+                    if (this.x > this.enemies[i].x) {
+                        this.dLeft = true;
+                    }
+                    this.left = false;
+                    this.right = false;
+                    this.jumping = false;
+                    
+                    this.fCount = 27;
+                    this.state = "damage";
+                    this.isDamaged = true;
+                    return;
+                }
+            
+            }
+        
+            return
+    }
+    
+    this.wallCol = function() { //BLOCK WHEN MOVING TO LEFT
         if (state = "l1") {
             var w = walls1;
-            if (this.wallColDetectL(w[0].x, w[0].y, w[0].width, w[0].height) ||
-                this.wallColDetectL(w[3].x, w[3].y, w[3].width, w[3].height)) {
-                return true;
-            } else {
-                return false;
+            var col = {left: false, right: false};
+            
+            if (this.wallColDetect(w[0].x, w[0].y, w[0].width, w[0].height).l ||
+                this.wallColDetect(w[4].x, w[4].y, w[4].width, w[4].height).l) {
+                col.left = true;
             }
+            
+                if (this.wallColDetect(w[1].x, w[1].y, w[1].width, w[1].height).r ||
+                this.wallColDetect(w[2].x, w[2].y, w[2].width, w[2].height).r ||
+                this.wallColDetect(w[3].x, w[3].y, w[3].width, w[3].height).r ||
+                this.wallColDetect(w[5].x, w[5].y, w[5].width, w[5].height).r ||
+                this.wallColDetect(w[6].x, w[6].y, w[6].width, w[6].height).r) {
+                col.right = true;
+            }
+        
+            return col;
         }
     }
     
-    this.wallColR = function() { //BLOCK WHEN MOVING TO RIGHT
-        if (state = "l1") {
-            var w = walls1;
-            if (this.wallColDetectL(w[1].x, w[1].y, w[1].width, w[1].height) ||
-                this.wallColDetectL(w[2].x, w[2].y, w[2].width, w[2].height) ||
-                this.wallColDetectL(w[4].x, w[4].y, w[4].width, w[4].height)) {
-                return true;
-            } else {
-                return false;
-            }
-        }
-    }
-    
-    this.reset = function(start_posX, start_posY, p, w, c) {
+    this.reset = function(start_posX, start_posY, p, w, c, e) {
         
         background1X = 0;
         background2X = 0;
@@ -619,18 +734,30 @@ var player = new function() {
             ];
         }
          
+        if (e == "e1") {
+            this.enemies = [
+                new enemy(1000, 500, 200, 140, 1, "l1"),
+            ];
+        }
+        
         this.x = start_posX;
         this.y = start_posY;
         this.yVel = 0;
+        this.xVel = 0;
+        this.isDamaged = false;
         this.jumping = false;
         this.lvl = {x: 0, y: -1080};
         this.coinCount = 0;
         this.deathDown = false;
         this.grounded = false;
         this.left = false;
+        this.dLeft = false;
         this.right = false;
         this.canJump = true;
         this.dead = false;
+        cBars = {x: 0, y: 0};
+        cutsceneTrigger = false;
+        door = {x: 6800, y: -620};
         this.state = "walk";
         this.fCount = 0;
     }
@@ -707,8 +834,10 @@ class coin {
             ctx.strokeRect(this.x, this.y, this.width, this.height);
         }
 
-        this.x += scroll.x;
-        this.y += scroll.y;
+        if (!player.dead) {
+            this.x += scroll.x;
+            this.y += scroll.y;
+        }
 
         this.c += dt;
         if (this.c > 50) {
@@ -769,15 +898,126 @@ class platform {
     }
 }
 
+class enemy {
+    constructor(x_pos, y_pos, wid, hei, AP, lL) {
+        this.x = x_pos;
+        this.y = y_pos;
+        this.width = wid;
+        this.height = hei;
+        this.startPosX = x_pos;
+        this.startPosY = y_pos;
+        this.AssignedPlatform = AP;
+        this.state = "walk";
+        this.dead = false;
+        this.l = lL;
+        this.ind = null;
+        this.fCount = 0;
+        this.MoveSpeed = 4;
+        this.moveRight = true;
+        this.c = 0;
+        this.images = [
+            //walk R
+            {x: 0, y: 0, w: 44, h: 31},
+            {x: 101, y: 0, w: 44, h: 31},
+            {x: 50, y: 0, w: 44, h: 31},
+                
+            //death
+            {x: -5, y: 48, w: 28, h: 25},//
+            {x: 24, y: 44, w: 26, h: 30},//
+            {x: 56, y: 43, w: 32, h: 32},
+            {x: 95, y: 37, w: 38, h: 38},
+            {x: 139, y: 37, w: 38, h: 38},
+            
+        ]
+    }
+    
+    draw() {
+        if (!this.dead) {
+            if (!player.dead) {
+                this.move();
+            }
+        } else if (this.fCount >= 7) {
+            player.enemies.splice(this.ind, 1);
+            return;
+        }
+        
+        ctx.drawImage(enemy1IMG, 
+                      this.images[this.fCount].x, this.images[this.fCount].y, this.images[this.fCount].w, this.images[this.fCount].h, 
+                      
+                      this.x - (this.width / 2), 
+                      this.y - (this.height / 2), 
+                      this.width, 
+                      this.height);
+        
+        
+        
+        
+        //col box
+        if (ShowColisionBounds) {
+            ctx.strokeStyle = "red"
+            ctx.lineWidth = "2";
+            ctx.strokeRect(this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
+        }
+        
+            
+        switch (this.state) {
+            case "walk":
+                this.c += dt;
+                if (this.c > 200) {
+                    this.c = 0;
+                    this.fCount++;
+
+                    if (this.fCount > 2) {
+                        this.fCount = 0;
+                    }
+                }
+                break;
+                
+            
+            case "dead":
+                this.width = 150;
+                this.height = this.width;
+                this.c += dt;
+                if (this.c > 100) {
+                    this.c = 0;
+                    this.fCount++;
+
+                }
+                break;
+        }
+        
+        if (!player.dead) {
+            this.x += scroll.x;
+            this.y += scroll.y;
+        }
+    }
+
+    
+    move() {
+        if (this.l = "l1") {
+            this.y = platforms1[this.AssignedPlatform].y - (this.height / 2);
+            
+            if (this.moveRight && (this.x + (this.width / 2)) <= (platforms1[this.AssignedPlatform].x + platforms1[this.AssignedPlatform].width)) {
+                this.x += this.MoveSpeed;
+            } else {this.moveRight = false};
+            
+            if (!this.moveRight && (this.x - (this.width / 2) >= platforms1[this.AssignedPlatform].x)) {
+                this.x -= this.MoveSpeed;
+            } else {
+                this.moveRight = true;
+            }
+        }
+    }
+}
 
 // X Y W H IMG
 var platforms1 = [
     new platform(0, 552, 1024, 500), //0, 408, 256, 17 // 0, 1632, 1024, 68
-    new platform(1024, 680, 1024, 500),
+    new platform(1024, 680, 1004, 500),
     new platform(2505, 398, 883, 30),
-    new platform(3902, 636, 1024, 500),
+    new platform(3922, 636, 1024, 500),
     new platform(4925, 458, 1024, 500),
-    new platform(5950, -620, 1024, 100),
+    new platform(5950, -620, 1024, 40),
     new platform(6974, 894, 1024, 1500),
     new platform(5124, 0, 238, 30),
     new platform(5720, -354, 238, 30),
@@ -788,11 +1028,13 @@ var platforms1 = [
     new platform(0, -803, 882, 30),
 ];
 var walls1 = [
-    new platform(1004, 552, 20, 1024),
-    new platform(4925, 458, 20, 290),
+    new platform(2024, 685, 20, 1024),
+    new platform(3902, 685, 20, 1024),
+    new platform(4925, 468, 20, 290),
     new platform(5948, -620, 20, 1200),
     new platform(6954, -620, 20, 1500),
     new platform(7374, -3000, 20, 3499),
+    new platform(6800, -1220, 30, 600),
 ];
 var UIc = new coin();
 
@@ -1047,6 +1289,17 @@ function Level1() {
     //player
     player.draw();
     
+     //enemies
+    for (i = 0; i < player.enemies.length; i++) {
+        player.enemies[i].draw();
+    }
+    
+    //door
+    ctx.fillStyle = "rgba(100, 50, 100, 1)"
+    ctx.fillRect(door.x, door.y, 30, -500)
+    door.x += scroll.x;
+    door.y += scroll.y;
+    
     //level
     ctx.drawImage(l1, player.lvl.x, player.lvl.y, 8000, 2160);
     
@@ -1054,6 +1307,7 @@ function Level1() {
     for (i = 0; i < platforms1.length; i++) {
         platforms1[i].colisionMove();
     }
+    
      
     //walls
     for (i = 0; i < walls1.length; i++) {
@@ -1092,6 +1346,8 @@ function Level1() {
     }
     
     
+    
+    
     //UI
     UIc.drawUI(10,10);
     ctx.fillStyle = "white";
@@ -1104,6 +1360,15 @@ function Level1() {
     if (debug) {
         ctx.fillStyle = "rgba(0,0,0,0.5)";
         ctx.fillRect(c.width - 10, 10, -500, 700);
+        
+        //platform num
+        for (i = 0; i < platforms1.length; i++) {
+            ctx.fillStyle = "white";
+            ctx.font = "40px arial";
+            ctx.textAlign = "center";
+            ctx.fillText(i, platforms1[i].x + (platforms1[i].width / 2), platforms1[i].y + 100)
+        }
+        
         
         ctx.strokeStyle = "rgba(255,0,0,0.5)";
         ctx.lineWidth = "20";
@@ -1133,10 +1398,16 @@ function Level1() {
         ctx.fillText("V: Collisions (Coin)", c.width - 20, 200);
         
         ctx.fillStyle = "white";
+        if (debugEO) {
+            ctx.fillStyle = "cyan";
+        }
+        ctx.fillText("E: Collision (Enemy)", c.width - 20, 250)
+        
+        ctx.fillStyle = "white";
         if (debug2) {
             ctx.fillStyle = "cyan";
         }
-        ctx.fillText("I: Free Walk", c.width - 20, 350);
+        ctx.fillText("I: Free Walk", c.width - 20, 300);
         
         ctx.fillStyle = "white";
         ctx.fillText("Free Walk Speed: " + fWalkSpeed, c.width - 20, 400);
@@ -1149,6 +1420,7 @@ function Level1() {
         ctx.fillText("U: Item Adder", c.width - 20, 600);
         ctx.fillStyle = "white";
         ctx.fillText("Y: Chance Item", c.width - 20, 650);
+        ctx.fillText("Selected Item: " + itemAdder.name, c.width - 20, 700);
         
         
         
@@ -1156,18 +1428,28 @@ function Level1() {
         if (itemAdder.enabled) {
             switch (itemAdder.selected) {
                 case 0:
+                    itemAdder.name = "Coin";
                     ctx.drawImage(coinIMG, 
                                   25, 3, 300, 299, 
                                   MouseX - 50, MouseY - 50, 100, 100);
                     break;
 
                 case 1:
+                    itemAdder.name = "Crab";
+                    ctx.drawImage(enemy1IMG, 
+                                  101, 0, 44, 31, 
+                                  MouseX - 70, MouseY - 100, 200, 140);
                     break;
             }
         }
         
     }
     
+    
+    //cutscenes
+    cutscene();
+    
+    //transisions
 	transisIn();
     transisOut();
 }
@@ -1389,6 +1671,28 @@ function transisIn() {
 //    }
 }
 
+function cutscene() {
+    if (cutsceneTrigger) {
+        player.yVel = 0;
+        player.xVel = 0;
+        player.state = "idle";
+        
+        ctx.fillStyle = "black";
+        ctx.fillRect(0,0 ,c.width, cBars.y);
+        ctx.fillRect(0,c.height,c.width, -cBars.y);
+
+        if (cBars.y < 150) {
+            cBars.y += 2;
+        }
+        
+    } else if (cBars.y > 0) {
+        ctx.fillStyle = "black";
+        ctx.fillRect(0,0 ,c.width, cBars.y);
+        ctx.fillRect(0,c.height,c.width, -cBars.y);
+        cBars.y -= 2;
+    }
+}
+
 function update(time = 0) {
     dt = time - lastTime;
     lastTime = time;
@@ -1431,7 +1735,7 @@ function update(time = 0) {
         
         case "l1":
             Level1();
-            if (!player.dead) {
+            if (!player.dead && !cutsceneTrigger) {
                 player.move();
             }
             break;
@@ -1455,6 +1759,9 @@ function update(time = 0) {
         case "sprite":
             ctx.fillStyle = "white";
             ctx.fillRect(0,0,c.width, c.height);
+            player.state = "damage"
+            player.boundingBox = true;
+            player.draw();
             break;
             
     }
@@ -1658,21 +1965,21 @@ document.addEventListener("keydown", event => {
                 //SPACE Or Enter
                 switch (player.lSelectX) {
                     case 450:
-                        player.reset(500, 0, platforms1, walls1, "c1");
+                        player.reset(500, 0, platforms1, walls1, "c1", "e1");
                         player.state = "idle";
                         transisionOut.state = "l1";
                         transisionOut.enabled = true;
                         break
                     
                     case 950:
-                        player.reset(500, 0, platforms2, walls2, "c2");
+                        player.reset(500, 0, platforms2, walls2, "c2", "e2");
                         player.state = "idle";
                         transisionOut.state = "l2";
                         transisionOut.enabled = true;
                         break
 
                     case 1460:
-                        player.reset(500, 0, platforms3, walls3, "c3");
+                        player.reset(500, 0, platforms3, walls3, "c3", "e3");
                         player.state = "idle";
                         transisionOut.state = "l3";
                         transisionOut.enabled = true;
@@ -1685,7 +1992,7 @@ document.addEventListener("keydown", event => {
             
         case "l1":
             
-            if ((event.keyCode == 32 || event.keyCode == 13 || event.keyCode == 38) && !debug2) {
+            if ((event.keyCode == 32 || event.keyCode == 13 || event.keyCode == 38) && !debug2 && !player.isDamaged && !cutsceneTrigger) {
                 //SPACE or Enter or UP
                 
                 if (!player.jumping && player.canJump) {
@@ -1706,7 +2013,7 @@ document.addEventListener("keydown", event => {
             }
             
             
-            if (((event.keyCode == 37 || event.keyCode == 65) && !player.right) && !debug2) {
+            if (((event.keyCode == 37 || event.keyCode == 65) && !player.right) && !debug2 && !player.isDamaged && player.state != "damage" && !cutsceneTrigger) {
                 player.right = false;
                 
                 //LEFT
@@ -1717,7 +2024,7 @@ document.addEventListener("keydown", event => {
                 player.left = true;
                 
                 break;
-            } else if (((event.keyCode == 39 || event.keyCode == 68) && !player.left) && !debug2) {
+            } else if (((event.keyCode == 39 || event.keyCode == 68) && !player.left) && !debug2 && !player.isDamaged && player.state != "damage" && !cutsceneTrigger) {
                 //RIGHT
                 
                 player.left = false;
@@ -1744,6 +2051,7 @@ document.addEventListener("keydown", event => {
                     debug2 = false;
                     debugC = false;
                     debugCO = false;
+                    debugEO = false;
                     itemAdder.enabled = false;
                     
                 }
@@ -1772,7 +2080,7 @@ document.addEventListener("keydown", event => {
             }else if (event.keyCode == 89 && debug && itemAdder.enabled) {
                 //RIGHT
                 
-                if (itemAdder.selected < 0) {
+                if (itemAdder.selected < 1) {
                     itemAdder.selected++;
                     
                 } else {
@@ -1788,6 +2096,11 @@ document.addEventListener("keydown", event => {
             }else if (event.keyCode == 86 && debug) {
                 //RIGHT
                 debugCO = !debugCO;
+                
+                break;
+            }else if (event.keyCode == 69 && debug) {
+                //RIGHT
+                debugEO = !debugEO;
                 
                 break;
             }
@@ -1936,6 +2249,22 @@ document.addEventListener("click", event => {
                    case 0:
                        player.coins.push(new coin(MouseX - 50, MouseY - 50))
                        break;
+                       
+                   case 1:
+                       var ind = null;
+                       for (i = 0; i < platforms1.length; i++) {
+                           if (MouseX > platforms1[i].x && 
+                               MouseX < platforms1[i].x + platforms1[i].width && MouseY > platforms1[i].y && 
+                               MouseY < platforms1[i].y + platforms1[i].height) {
+                               ind = i;
+                               break;
+                            }
+                       }
+                       
+                       if (ind != null) {
+                           player.enemies.push(new enemy(MouseX, MouseY, 200, 140, ind, "l1"))   
+                       }
+                       break;
                }
            }
            break;
@@ -1970,6 +2299,7 @@ function genRand(min, max, decimalPlaces) {
 //waterIMG src="images/waterSpriteSheet.png"
 
 //set onload event
+enemy1IMG.onload = function() {imgLoad();}
 fs2.onload = function() {imgLoad();}
 fs1.onload = function() {imgLoad();}
 coinIMG.onload = function() {imgLoad();}
@@ -1993,6 +2323,7 @@ goTitleIMG.onload = function() {imgLoad();}
 waterIMG.onload = function() {imgLoad();}
 
 //set image source
+enemy1IMG.src = "images/enemy1.png";
 fs1.src = "images/f1.png";
 fs2.src = "images/f2.png";
 coinIMG.src = "images/coin.png";
@@ -2015,7 +2346,7 @@ ywTitleIMG.src = "images/YouWinTitle.png";
 goTitleIMG.src = "images/gameOverTitle.png";
 waterIMG.src = "images/waterSpriteSheet.png";
 
-var imgCount = 0, imgMax = 21;
+var imgCount = 0, imgMax = 22;
 function imgLoad() {
     imgCount++;
     if (imgCount == imgMax) {
