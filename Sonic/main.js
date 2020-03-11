@@ -59,7 +59,7 @@ var scroll = {x: 0,
               boundRight: 1100, 
               boundBottom: c.height - 200, 
               boundTop: 150, 
-              smoothing: 0.5, 
+              smoothing: 1, 
               speed: 15,
               speed2: 20,
              };
