@@ -57,6 +57,31 @@
                 
             }
             
+            .grid-item2 {
+                position: fixed;
+                width: 480px;
+                 bottom: 0;
+                right: 0;
+                background: rgba(255,255,255,0);
+                /*border: solid black 2px;*/
+                transform: translateY(85px);
+                overflow:hidden;
+                
+                
+            }
+            
+            @media only screen and (max-width: 1000px) {
+              .grid-item2 {
+                  width: 0;
+                }
+            }
+            
+             @media only screen and (max-height: 600px) {
+              .grid-item2 {
+                  width: 0;
+                }
+            }
+            
             .grid-item h1 {
                 z-index: 5;
                 transform: translateY(-40px);
@@ -64,13 +89,12 @@
                 font-family: Raleway;
                 font-weight: 200;
                 font-size: 60px;
-                
+                text-shadow: 2px 2px black;
                 
             }
             
             .grid-item img {
                 transition: .4s ease-in-out;
-                
                 
             }
             
@@ -138,16 +162,6 @@
                 left:0px;
             }
             
-            .version {
-                position: absolute;
-                z-index: 10;
-                font-size: 30px;
-                font-family: Raleway;
-                font-weight: 300;
-                text-shadow: 4px 4px #000;
-                bottom:-20px;
-                right:5px;
-            }
         </style>
     </head>
     
@@ -159,7 +173,7 @@
             <div class="grid-item" onclick="location.href='Tetris/v2/index.html'" ><img width="100%" src="MenuImages/tetrisPlate.png" /><h1>Tetris</h1></div>
             <div class="grid-item" onclick="location.href='FlappyBird/index.html'" ><img width="100%" src="MenuImages/flappyPlate.png" /><h1>Flappy Bird</h1></div>
             <div class="grid-item" onclick="location.href='Stacker/index.html'" ><img width="100%" src="MenuImages/stackerPlate.png" /><h1>Stacker</h1></div>
-            <div class="grid-item" onclick="location.href='Snake/index.html'" ><img width="100%" src="MenuImages/snakePlate.png" /><h1>Snake</h1></div>
+            <div class="grid-item" onclick="location.href='Snake/index.html'"><img width="100%" src="MenuImages/snakePlate.png" /><h1>Snake</h1></div>
             <div class="grid-item" onclick="location.href='Pong/index.html'" ><img width="100%" src="MenuImages/pongPlate.png" /><h1>Tennis For 2</h1></div>
             <div class="grid-item" onclick="location.href='shooter2/index.html'" ><img width="100%" src="MenuImages/shooterPlate.png" /><h1>Shooter</h1></div>
             <div class="grid-item" onclick="location.href='clicker/index.html'" ><img width="100%" src="MenuImages/ckickerImg.png" /><h1>Clicker</h1></div>
@@ -170,16 +184,9 @@
             <div class="grid-item"><h1></h1></div>
             <div class="grid-item"><h1></h1></div>
             <div class="grid-item"><h1></h1></div>
-            <div class="grid-item"><h1></h1></div>
-            <div class="grid-item"><h1></h1></div>
-            <div class="grid-item"><h1></h1></div>
-            <div class="grid-item"><h1></h1></div>
+            <div class="grid-item2"><iframe src="https://docs.google.com/forms/d/e/1FAIpQLSc6tdhM6GXZGINHGaYRFNmZKTKj5TfKbVGM2G2m9EGtsetxKw/viewform?embedded=true" width="100%" height="510px" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe></div>
         </div>
         <!--div class="box"><b>Umar Rajput</b></div-->
-        
-        <script>
-            
-        </script>
     </body>
     
 </html>
