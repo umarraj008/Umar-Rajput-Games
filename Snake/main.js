@@ -222,7 +222,11 @@ function move(dir) {
         snake_color = bigFruit.c;
         bigFruit.x = 50;
         score+= 20;
-        snake.push({x: snake[0].x, y: snake[0].y, col: snake_color})
+        snake.push({x: snake[0].x, y: snake[0].y, col: snake_color});
+	snake.push({x: snake[0].x, y: snake[0].y, col: snake_color});
+	snake.push({x: snake[0].x, y: snake[0].y, col: snake_color});
+	snake.push({x: snake[0].x, y: snake[0].y, col: snake_color});
+	snake.push({x: snake[0].x, y: snake[0].y, col: snake_color});
         if (interval > 38) {
             interval--;
         }
