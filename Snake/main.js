@@ -178,6 +178,7 @@ function move(dir) {
         replaceFruit(fruit2);
         score++;
         snake.push({x: snake[0].x, y: snake[0].y, col: snake_color})
+        snake.push({x: snake[1].x, y: snake[1].y, col: snake_color})
         if (interval > 38) {
             interval--;
         }
@@ -200,6 +201,8 @@ function move(dir) {
         replaceFruit(fruit3);
         score++;
         snake.push({x: snake[0].x, y: snake[0].y, col: snake_color})
+        snake.push({x: snake[1].x, y: snake[1].y, col: snake_color})
+        snake.push({x: snake[2].x, y: snake[2].y, col: snake_color})
         if (interval > 38) {
             interval--;
         }
@@ -223,10 +226,10 @@ function move(dir) {
         bigFruit.x = 50;
         score+= 20;
         snake.push({x: snake[0].x, y: snake[0].y, col: snake_color});
-	snake.push({x: snake[0].x, y: snake[0].y, col: snake_color});
-	snake.push({x: snake[0].x, y: snake[0].y, col: snake_color});
-	snake.push({x: snake[0].x, y: snake[0].y, col: snake_color});
-	snake.push({x: snake[0].x, y: snake[0].y, col: snake_color});
+	    snake.push({x: snake[1].x, y: snake[1].y, col: snake_color});
+	    snake.push({x: snake[2].x, y: snake[2].y, col: snake_color});
+	    snake.push({x: snake[3].x, y: snake[3].y, col: snake_color});
+	    snake.push({x: snake[4].x, y: snake[4].y, col: snake_color});
         if (interval > 38) {
             interval--;
         }
