@@ -13,6 +13,8 @@ var player = {
     right: false,
     speed: 5,
     rot: 1,
+    vx: 500,
+    vy: 0,
 }
 var jeff = 0.1;
 var map = [
@@ -65,12 +67,18 @@ function draw_game() {
     //ctx.fillRect(player.x, player.y, 100, 200);
 
     player_move();
-    draw_rect3D(player.x, player.y + map_loc.y, 100, 50, 100, "red", "lime", "blue")
+    draw_rect3D(player.x, player.y, 100, 50, 100, "red", "lime", "blue")
     
     edge_col(map, player);
     
     map_loc.y = 600 + Math.sin(jeff) * 20
     jeff+=0.05;
+    
+    ctx.fillStyle = "black";
+    ctx.font = "70px arial";
+    ctx.fillText("Isometric Game Engine Demo", 30, 100);
+    ctx.font = "50px arial";
+    ctx.fillText("Use Arrow Keys to Move", 30, 150);
 }
 
 function draw_map(ox, oy) {
@@ -142,25 +150,23 @@ function draw_map(ox, oy) {
 
 function player_move() {
     if (player.left) {
-        player.x -= player.speed;
-        
-        if (edge_col(map, player)) {
-            player.x += player.speed;
-        }
+        player.vx -= player.speed;
     }
     
     if (player.right) {
-        player.x += player.speed;
+        player.vx += player.speed;
     }
     
     if (player.up) {
-        player.y -= (player.speed/2);
+        player.vy -= (player.speed);
     }
     
     if (player.down) {
-        player.y += (player.speed/2);
+        player.vy += (player.speed);
     }
     
+    player.x = map_loc.x + player.vx;
+    player.y = map_loc.y + player.vy;
 }
 
 //map_loc.x + (x * 50) + (y * 50), map_loc.y - (x * 25) + (y * 25) + 25, 4, 4
@@ -208,7 +214,7 @@ function edge_col(mp, obj) {
                         }
                         
                         if (polyPoint(verts, player.x, player.y + 125) || polyPoint(verts, player.x+50, player.y + 150)) {
-                            player.x+=player.speed;
+                            player.vx+=player.speed;
                             player.left = false;
                             player.right = false;
                             player.up = false;
@@ -224,7 +230,7 @@ function edge_col(mp, obj) {
                         }
                         
                         if (polyPoint(verts, player.x+100, player.y + 125)|| polyPoint(verts, player.x+50, player.y + 100)) {
-                            player.x-=player.speed;
+                            player.vx-=player.speed;
                             player.left = false;
                             player.right = false;
                             player.up = false;
@@ -238,7 +244,7 @@ function edge_col(mp, obj) {
                         }
                         
                         if (polyPoint(verts, player.x, player.y + 125)|| polyPoint(verts, player.x+50, player.y + 100)) {
-                            player.y+=player.speed;
+                            player.vy+=player.speed;
                             player.left = false;
                             player.right = false;
                             player.up = false;
@@ -253,7 +259,7 @@ function edge_col(mp, obj) {
                         }
                         
                         if (polyPoint(verts, player.x+50, player.y + 150)|| polyPoint(verts, player.x+100, player.y + 125)) {
-                            player.y-=player.speed;
+                            player.vy-=player.speed;
                             player.left = false;
                             player.right = false;
                             player.up = false;
