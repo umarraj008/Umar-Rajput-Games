@@ -20,8 +20,7 @@
             }
             
             body {
-                /*background: #141414;*/
-                background: #000;
+                background: #141414;
             }
             
             br.clear {
@@ -227,7 +226,7 @@
                 cursor: pointer;
             }
             
-            #myVideo {
+            #backGif {
                 padding: 0;
                 position: fixed;
                 width: 1920px;
@@ -241,10 +240,8 @@
         </style>
     </head>
     <body>
-        <!-- VIDEO BACKGROUND -->
-        <video autoplay muted loop id="myVideo">
-          <source id="source" src="" type="video/mp4">
-        </video>
+        <!-- GIF BACKGROUND -->
+        <img id="backGif" src="MenuImages/gifs/tv.gif">
         
         <script>
             var dt = 0;
@@ -252,13 +249,13 @@
             var counter = 0;
             var counter2 = 0;
             var minTime = 3;
-            var maxTime = 7;
+            var maxTime = 6.5;
             var selTime = (rand(minTime,maxTime)*1000);
             var playTransition = false;
             
             function selectVideo(num) {
-                document.getElementById("source").setAttribute('src', 'videos/v' + num + '.mp4');
-                document.getElementById("myVideo").load();
+                document.getElementById("backGif").setAttribute('src', 'MenuImages/gifs/v' + num + '.gif');
+                //document.getElementById("backGif").load();
             }
             
             function update(time = 0) {
@@ -269,15 +266,15 @@
                 if (counter > selTime && !playTransition) {
                     counter = 0;
                     playTransition = true;
-                    document.getElementById("source").setAttribute('src', 'videos/tv.mp4');
-                    document.getElementById("myVideo").load();       
+                    document.getElementById("backGif").setAttribute('src', 'MenuImages/gifs/tv.gif');
+                    //document.getElementById("backGif").load();       
                     counter2 = 0;
                 }
                 
                 if (playTransition) {
                     counter2 += dt;
                     
-                    if (counter2 > 2000) {
+                    if (counter2 > 1500) {
                         counter2 = 0;
                         playTransition = false;
                         selTime = (rand(minTime, maxTime) * 1000);
@@ -304,7 +301,7 @@
             <h1 id="titleText">Umar Rajput</h1>
             <div id="buttonContainer">
                 <div id="button" onclick=" location.href='index.html' "><p>Home</p></div> 
-                <div id="button" onclick=" location.href='about.html' "><p>About</p></div>
+                <div id="button" onclick=" location.href='About.html' "><p>About</p></div>
             </div>
         </header>
         
@@ -321,7 +318,7 @@
                 <div id="gameSelection" onclick=" location.href='Shooter2/index.html' "><div id="textBox"><center><p>Shooter</p></center></div><img src="MenuImages/shooterPlate.png" height="100%"></div> 
                 <div id="gameSelection" onclick=" location.href='clicker/index.html' "><div id="textBox"><center><p>Clicker</p></center></div><img src="MenuImages/ckickerImg.png" height="100%"></div> 
                 <div id="gameSelection" onclick=" location.href='Sonic/index.html' "><div id="textBox"><center><p>Sonic</p></center></div><img src="MenuImages/sonicPlate.png" height="100%"></div> 
-                <div id="gameSelection" onclick=" location.href='' "><div id="textBox"><center><p>Isometric Game Engine</p></center></div><img src="MenuImages/inDev.png" height="100%"></div> <!-- CHANGE -->
+                <div id="gameSelection" onclick=" location.href='isoGameDemo/index.html' "><div id="textBox"><center><p>Isometric Game Engine</p></center></div><img src="MenuImages/inDev.png" height="100%"></div> 
             </div>
         </div>
         
@@ -330,16 +327,16 @@
         <h2 id="subtitle">Java Script Web Games</h2>
         <div class="wrapper2">
             <div class="content">
-                <div onclick=" location.href='https://github.com/umarraj008/umarraj008.github.io/tree/master/XandO' "><h1>X and O</h1><img src="MenuImages/xandoPlate.png" height="100%"></div> <!-- CHANGE -->
-                <div onclick=" location.href='https://github.com/umarraj008/umarraj008.github.io/tree/master/FlappyBird' "><h1>Flappy Bird</h1><img src="MenuImages/flappyPlate.png" height="100%"></div> <!-- CHANGE -->
-                <div onclick=" location.href='https://github.com/umarraj008/umarraj008.github.io/tree/master/Tetris' "><h1>Tetris</h1><img src="MenuImages/tetrisPlate.png" height="100%"></div> <!-- CHANGE -->
-                <div onclick=" location.href='https://github.com/umarraj008/umarraj008.github.io/tree/master/Stacker' "><h1>Stacker</h1><img src="MenuImages/stackerPlate.png" height="100%"></div> <!-- CHANGE -->
-                <div onclick=" location.href='https://github.com/umarraj008/umarraj008.github.io/tree/master/Snake' "><h1>Snake</h1><img src="MenuImages/snakePlate.png" height="100%"></div> <!-- CHANGE -->
-                <div onclick=" location.href='https://github.com/umarraj008/umarraj008.github.io/tree/master/Pong' "><h1>Tennis For 2</h1><img src="MenuImages/pongPlate.png" height="100%"></div> <!-- CHANGE -->
-                <div onclick=" location.href='https://github.com/umarraj008/umarraj008.github.io/tree/master/shooter2' "><h1>Shooter</h1><img src="MenuImages/shooterPlate.png" height="100%"></div> <!-- CHANGE -->
-                <div onclick=" location.href='https://github.com/umarraj008/umarraj008.github.io/tree/master/clicker' "><h1>Clicker</h1><img src="MenuImages/ckickerImg.png" height="100%"></div> <!-- CHANGE -->
-                <div onclick=" location.href='https://github.com/umarraj008/umarraj008.github.io/tree/master/Sonic' "><h1>Sonic</h1><img src="MenuImages/sonicPlate.png" height="100%"></div> <!-- CHANGE -->
-                <div onclick=" location.href='https://github.com/umarraj008/umarraj008.github.io/tree/master/isoGameDemo' "><h1>Isometric Game Engine</h1><img src="MenuImages/inDev.png" height="100%"></div> <!-- CHANGE -->
+                <div onclick=" location.href='https://github.com/umarraj008/umarraj008.github.io/tree/master/XandO' "><h1>X and O</h1><img src="MenuImages/xandoPlate.png" height="100%"></div>
+                <div onclick=" location.href='https://github.com/umarraj008/umarraj008.github.io/tree/master/FlappyBird' "><h1>Flappy Bird</h1><img src="MenuImages/flappyPlate.png" height="100%"></div>
+                <div onclick=" location.href='https://github.com/umarraj008/umarraj008.github.io/tree/master/Tetris' "><h1>Tetris</h1><img src="MenuImages/tetrisPlate.png" height="100%"></div> 
+                <div onclick=" location.href='https://github.com/umarraj008/umarraj008.github.io/tree/master/Stacker' "><h1>Stacker</h1><img src="MenuImages/stackerPlate.png" height="100%"></div> 
+                <div onclick=" location.href='https://github.com/umarraj008/umarraj008.github.io/tree/master/Snake' "><h1>Snake</h1><img src="MenuImages/snakePlate.png" height="100%"></div> 
+                <div onclick=" location.href='https://github.com/umarraj008/umarraj008.github.io/tree/master/Pong' "><h1>Tennis For 2</h1><img src="MenuImages/pongPlate.png" height="100%"></div> 
+                <div onclick=" location.href='https://github.com/umarraj008/umarraj008.github.io/tree/master/shooter2' "><h1>Shooter</h1><img src="MenuImages/shooterPlate.png" height="100%"></div> 
+                <div onclick=" location.href='https://github.com/umarraj008/umarraj008.github.io/tree/master/clicker' "><h1>Clicker</h1><img src="MenuImages/ckickerImg.png" height="100%"></div> 
+                <div onclick=" location.href='https://github.com/umarraj008/umarraj008.github.io/tree/master/Sonic' "><h1>Sonic</h1><img src="MenuImages/sonicPlate.png" height="100%"></div> 
+                <div onclick=" location.href='https://github.com/umarraj008/umarraj008.github.io/tree/master/isoGameDemo' "><h1>Isometric Game Engine</h1><img src="MenuImages/inDev.png" height="100%"></div>
             </div>
         </div>
         
@@ -351,7 +348,7 @@
         <br clear="">
         <footer>
             <p>Umar Rajput</p> 
-            <p class="link" onclick=" location.href='about.html' ">About</p><!-- CHANGE -->
+            <p class="link" onclick=" location.href='About.html' ">About</p>
         </footer>
     </body>
 </html>
