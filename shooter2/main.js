@@ -6,6 +6,36 @@ var dt;
 
 var displayMenu = true;
 var howToPlay = false;
+var mouseStyle = "default";
+
+var gunMenu = {
+    show: false,
+    button:{
+        x: c.width - 350, 
+        y: c.height - 200, 
+        w: 350, 
+        h: 200, 
+        over: false, 
+        color: "rgba(10,10,100,0.5)", 
+        highlight: "rgba(0,0,100,0.7)", 
+        text: {string: "Gun Menu", x: c.width - 160, y: c.height - 80, color: "white", size: "50px roboto"}},
+}
+
+var wave = {
+    round: 1,
+    opacity: 0,
+    display: false,
+    count: 0,
+    duration: 300,
+}
+
+var levels = [
+    null,
+    {enabled: false, completed: false, current: false},
+    {enabled: false, completed: false, current: false},
+    {enabled: false, completed: false, current: false},
+    {enabled: false, completed: false, current: false},
+];
 
 //testing
 var s1 = true;
@@ -41,12 +71,19 @@ var scrollOffset = {
     y: 0,
 }
 
+//GUN ADDING CHECKS
+// ADD GUN TO GUNS LIST
+// ADD IMAGE TO GUN
+// DRAW GUN IN BAR METHOD
+// BULLET CONFIGURATION
+// SHOOT GUN CONFIGURATION
+
 // RANGE SPEED INCREMENT/per DAMAGE IMAGE
 var guns = {
     empty: {r: 0, s: 0, i: 0, d: 0, image: document.getElementById("null")},
-    pistol: {r: 40000, s: 20, i: 500, d: 25, image: document.getElementById("pistol")},
-    ak: {r: 40000, s: 20, i: 70, d: 40, image: document.getElementById("ak")},
-    shotgun: {r: 40000, s: 20, i: 800, d: 70, image: document.getElementById("shotgun")},
+    pistol: {r: 40000, s: 20, i: 600, d: 200, image: document.getElementById("pistol")},
+    ak: {r: 40000, s: 20, i: 70, d: 70, image: document.getElementById("ak")},
+    shotgun: {r: 40000, s: 20, i: 800, d: 150, image: document.getElementById("shotgun")},
 }
 
 var playerIMG = document.getElementById("player");
@@ -59,7 +96,7 @@ var player = {
     y: 0,
     a: 0,
     image: playerIMG,
-    gun: [guns.pistol, guns.ak, guns.shotgun, guns.empty, guns.empty],
+    gun: [guns.pistol, guns.empty, guns.empty, guns.empty, guns.empty],
     bulletOffset: 0,
     dir: {
         left: false,
@@ -137,9 +174,9 @@ var ShootCount = 0;
 //var ShootInterval = 1000;
 
 //ENEMIES SETUP
-for (i = 0; i < 1000; i++) {
-    SpawnEnemy(300, 100, "red", 10, 40);    
-}
+//for (i = 0; i < 1000; i++) {
+//    SpawnEnemy(300, 100, "red", 10, 40);    
+//}
 
 var GRIDoffset2X = 0;
 var GRIDoffset2Y = 0;
@@ -216,6 +253,7 @@ function drawMenu() {
         if (menu.buttons.play.over) {
             ctx.fillStyle = menu.buttons.play.highlight;
             ctx.fillRect(menu.buttons.play.x, menu.buttons.play.y, menu.buttons.play.w, menu.buttons.play.h);
+            mouseStyle = "pointer";
 
         } else {
             ctx.fillStyle = menu.buttons.play.color;
@@ -231,6 +269,7 @@ function drawMenu() {
         if (menu.buttons.quit.over) {
             ctx.fillStyle = menu.buttons.quit.highlight;
             ctx.fillRect(menu.buttons.quit.x, menu.buttons.quit.y, menu.buttons.quit.w, menu.buttons.quit.h);
+            mouseStyle = "pointer";
 
         } else {
             ctx.fillStyle = menu.buttons.quit.color;
@@ -246,6 +285,7 @@ function drawMenu() {
         if (menu.buttons.HTP.over) {
             ctx.fillStyle = menu.buttons.HTP.highlight;
             ctx.fillRect(menu.buttons.HTP.x, menu.buttons.HTP.y, menu.buttons.HTP.w, menu.buttons.HTP.h);
+            mouseStyle = "pointer";
 
         } else {
             ctx.fillStyle = menu.buttons.HTP.color;
@@ -268,6 +308,7 @@ function drawMenu() {
         if (menu.buttons.back.over) {
             ctx.fillStyle = menu.buttons.back.highlight;
             ctx.fillRect(menu.buttons.back.x, menu.buttons.back.y, menu.buttons.back.w, menu.buttons.back.h);
+            mouseStyle = "pointer";
 
         } else {
             ctx.fillStyle = menu.buttons.back.color;
@@ -308,6 +349,9 @@ function drawMenu() {
         }
                 
     }
+    
+    c.style.cursor = mouseStyle;
+    mouseStyle = "default";
 }
 
 
@@ -400,6 +444,7 @@ function draw() {
     
     ctx.restore();
     
+    // UI //
     
     //MAP
     ctx.fillStyle = "rgba(200,200,200,0.5)";
@@ -453,7 +498,9 @@ function draw() {
     ctx.font = "40px roboto";
     ctx.fillText("X: " + -scrollOffset.x + " Y: " + scrollOffset.y, 20, 320);
     
-    //gun rack display
+    
+    
+    //GUN RACK DISPLAY
     ctx.fillStyle = "rgba(200,200,200,0.5)";
     ctx.fillRect(20 ,c.height / 2 - 15 + 440 ,420,90);
     
@@ -484,6 +531,15 @@ function draw() {
     ctx.lineTo(20 + 84 * 4,c.height / 2 - 15 + 530);
     ctx.stroke();
     
+    //GUN RACK TOOL TIP
+    ctx.fillStyle = "black";
+    ctx.fillText("[1]", 40, c.height / 2 - 15 + 420);
+    ctx.fillText("[2]", 123,c.height / 2 - 15 + 420);
+    ctx.fillText("[3]", 208,c.height / 2 - 15 + 420);
+    ctx.fillText("[4]", 295,c.height / 2 - 15 + 420);
+    ctx.fillText("[5]", 376,c.height / 2 - 15 + 420);
+    
+    
     //BAR SELECTION HIGHLIGHT
     if(player.gunSelection == 0) {
         ctx.fillStyle = "rgba(33,214,255,0.5)";
@@ -511,7 +567,41 @@ function draw() {
     DrawGunInRack(guns.ak);
     DrawGunInRack(guns.shotgun);
     
+    //WAVE TEXT
+    if (wave.display) {
+        ctx.fillStyle = "rgba(0,0,0," + wave.opacity + ")"; 
+        ctx.font = "150px roboto";
+        ctx.textAlign = "center";
+        ctx.fillText("Level " + wave.round, 960, 480);
+    }
     
+    //GUN MENU
+    if(gunMenu.show) {
+        mouseStyle = "default";
+        ctx.fillStyle = "rgba(200,200,200,0.6)";
+        ctx.fillRect(0 ,0, c.width, c.height)
+        
+        ctx.fillStyle = "cyan";
+        ctx.fillRect(0,0,200,200);
+
+    }
+    
+    //GUN MENU BUTTON
+    if (gunMenu.button.over) {
+            ctx.fillStyle = gunMenu.button.highlight;
+            ctx.fillRect(gunMenu.button.x, gunMenu.button.y, gunMenu.button.w, gunMenu.button.h);
+            mouseStyle = "pointer";
+
+        } else {
+            ctx.fillStyle = gunMenu.button.color;
+            ctx.fillRect(gunMenu.button.x, gunMenu.button.y, gunMenu.button.w, gunMenu.button.h);
+        }
+        
+        ctx.fillStyle = gunMenu.button.text.color; 
+        ctx.font = gunMenu.button.text.size;
+        ctx.textAlign = "center";
+        ctx.fillText(gunMenu.button.text.string, gunMenu.button.text.x, gunMenu.button.text.y - 30);
+        ctx.fillText("[M]", gunMenu.button.text.x, gunMenu.button.text.y + 30);
     
     
     //PAUSE OVERLAY MUST BE AT BOTTOM
@@ -528,6 +618,7 @@ function draw() {
         if (menu.buttons.gameBack.over) {
             ctx.fillStyle = menu.buttons.gameBack.highlight;
             ctx.fillRect(menu.buttons.gameBack.x, menu.buttons.gameBack.y, menu.buttons.gameBack.w, menu.buttons.gameBack.h);
+            mouseStyle = "pointer"
 
         } else {
             ctx.fillStyle = menu.buttons.gameBack.color;
@@ -538,7 +629,7 @@ function draw() {
         ctx.font = menu.buttons.gameBack.text.size;
         ctx.textAlign = "center";
         ctx.fillText(menu.buttons.gameBack.text.string, menu.buttons.gameBack.text.x, menu.buttons.gameBack.text.y);
-
+        
     }
     
     //GAMEOVER OVERLAY MUST BE AT BOTTOM
@@ -568,6 +659,23 @@ function draw() {
 
     }
 
+    //MENU POINTER
+    c.style.cursor = mouseStyle;
+    
+    if (gamePause || gameOver) {
+        mouseStyle = "default"
+    } else {
+        mouseStyle = "none";
+    }
+    
+    //GAME MOUSE
+    if (!gamePause && !gameOver && !gunMenu.show) {
+        ctx.fillStyle = "rgba(255,0,0,0.4)";
+        ctx.beginPath();
+        ctx.ellipse(MouseX, MouseY, 10, 10, Math.PI / 4, 0, 2 * Math.PI)
+        ctx.fill();
+    } 
+    
 }
 
 function drawGun(x, y, g) {
@@ -609,6 +717,55 @@ function DrawGunInRack(g) {
 }
 
 var f = 90 / 180 * Math.PI;
+
+
+function gamePlay() {
+    //WAVE TEXT
+    if (wave.count > wave.duration && wave.display) {
+        wave.count = 0;
+        wave.display = false;
+        wave.opacity = 0;
+        levels[wave.round].enabled = true;
+        levels[wave.round].current = true;
+    }
+    
+    //wave Text Animation
+    if (wave.display) {
+        if (wave.count < 100 && wave.opacity <= 1) {
+            wave.opacity += 0.05;
+        }
+        
+        if (wave.count > 200) {
+            wave.opacity -= 0.01;
+        }
+        wave.count += 1;
+    }
+    
+    //LEVELS SETUP
+    if (levels[1].enabled) {
+        levels[1].enabled = false;
+        SpawnEnemy2(0, 0, 10, "red", 10, 40);
+    }
+    
+    if (levels[2].enabled) {
+        levels[2].enabled = false;
+        SpawnEnemy2(0, 0, 10, "pink", 10, 40);
+        SpawnEnemy2(0, 0, 10, "yellow", 10, 40);
+        SpawnEnemy2(0, 0, 10, "pink", 10, 40);
+        SpawnEnemy2(0, 0, 10, "yellow", 10, 40);
+    }
+
+
+    //ENEMIES DEAD IN WAVE
+    if (enemies.length <= 0 && levels[wave.round].current) {
+        levels[wave.round].current = false;
+        wave.round++;
+        wave.display = true;
+    }
+    
+    
+}
+
 
 function playerMove() {
     
@@ -706,30 +863,6 @@ function playerMove() {
         barColor = "lime";
     }
     
-    //testing spawn enemies
-    if (score > 100 && s1) {
-        for (i = 0; i< 2000; i++) {
-            SpawnEnemy(300, 100, "lightred", 10, 40);
-            
-        }
-        s1 = false
-    }
-    if (score > 500 && s2) {
-        
-        for (i = 0; i< 1000; i++) {
-            SpawnEnemy(300, 500, "darkgreen", 20, 60);
-        }
-        s2 = false
-    }
-    if (score > 1000 && s3) {
-        
-        for (i = 0; i< 200; i++) {
-            //enemies.splice(i, 0);
-            SpawnEnemy(300, 900, "purple", 40, 100);
-        }
-        s3 = false
-    }
-    ////////
     
     //increase health when not injured
     if (player.health < 100 && player.canDamage && player.healCount > player.healTime) {
@@ -848,7 +981,7 @@ function bulletMove() {
             if (player.bullets[i].x - 5 < enemies[e].x + (enemies[e].s / 2) && player.bullets[i].x + 5 > enemies[e].x - (enemies[e].s / 2) &&
                player.bullets[i].y - 5 < enemies[e].y + (enemies[e].s / 2) && player.bullets[i].y + 5 > enemies[e].y - (enemies[e].s / 2)) {
                 KillEnemy(i, e, enemies[e].x, enemies[e].y);
-                SpawnEnemy(300, 100, "red", 10, 40);
+                //SpawnEnemy(300, 100, "red", 10, 40);
                 break;
             }
             
@@ -878,14 +1011,14 @@ function KillEnemy(bullet, enemy, ex, ey) {
     enemies[enemy].h -= player.gun[player.gunSelection].d;
     if (enemies[enemy].h <= 0) {
         var parts = [
-            new particle(ex, ey, 5, "red", 50),
-            new particle(ex, ey, 5, "red", 50),
-            new particle(ex, ey, 5, "red", 50),
-            new particle(ex, ey, 5, "red", 50),
-            new particle(ex, ey, 5, "red", 50),
-            new particle(ex, ey, 5, "red", 50),
-            new particle(ex, ey, 5, "red", 50),
-            new particle(ex, ey, 5, "red", 50),
+            new particle(ex, ey, 5, enemies[enemy].color, 50),
+            new particle(ex, ey, 5, enemies[enemy].color, 50),
+            new particle(ex, ey, 5, enemies[enemy].color, 50),
+            new particle(ex, ey, 5, enemies[enemy].color, 50),
+            new particle(ex, ey, 5, enemies[enemy].color, 50),
+            new particle(ex, ey, 5, enemies[enemy].color, 50),
+            new particle(ex, ey, 5, enemies[enemy].color, 50),
+            new particle(ex, ey, 5, enemies[enemy].color, 50),
         ]
         particleSpots.push(parts);
         enemies.splice(e,1);
@@ -905,11 +1038,11 @@ function Shoot() {
         player.bullets.push(new bull(-scrollOffset.x, -scrollOffset.y, player.gun[player.gunSelection].r, player.gun[player.gunSelection].s));
         
     }else if (player.gun[player.gunSelection] == guns.shotgun) {
-        player.bulletOffset = 25;
+        player.bulletOffset = genRand(2,25,2);
         player.bullets.push(new bull(-scrollOffset.x, -scrollOffset.y, player.gun[player.gunSelection].r, player.gun[player.gunSelection].s));
         player.bulletOffset = 0;
         player.bullets.push(new bull(-scrollOffset.x, -scrollOffset.y, player.gun[player.gunSelection].r, player.gun[player.gunSelection].s));
-        player.bulletOffset = -25;
+        player.bulletOffset = -genRand(2,25,2);
         player.bullets.push(new bull(-scrollOffset.x, -scrollOffset.y, player.gun[player.gunSelection].r, player.gun[player.gunSelection].s));
                    
     }
@@ -920,11 +1053,14 @@ function update(time = 0) {
     lastTime = time;
     if (!displayMenu) {
         if (!gamePause) {
-            if (!gameOver) {
-                particlesAnim();
-                EnemyMove();
-                playerMove();
-                bulletMove();
+            if (!gunMenu.show) {
+                if (!gameOver) {
+                    particlesAnim();
+                    gamePlay();
+                    EnemyMove();
+                    playerMove();
+                    bulletMove();
+                }
             }
         }
         draw();
@@ -1067,11 +1203,25 @@ function handleMouseMove(event) {
         }
     }
     
+    if (MouseX <= (gunMenu.button.x + gunMenu.button.w) && MouseX >= gunMenu.button.x &&
+        MouseY <= (gunMenu.button.y + gunMenu.button.h) && MouseY >= gunMenu.button.y) {
+        gunMenu.button.over = true;
+    } else {
+        gunMenu.button.over = false;
+    }
+    
 }
 
 function MouseDown(event) {
-    player.shoot = true;
     player.image = playerShootIMG;
+    if (!gameOver && !displayMenu && !gamePause && !gunMenu.show) {
+        if (player.gun[player.gunSelection] == guns.pistol ||
+            player.gun[player.gunSelection] == guns.shotgun) {
+            Shoot();
+        } else {
+            player.shoot = true;        
+        }
+    }
 }
 
 function MouseUp(event) {
@@ -1082,7 +1232,7 @@ function MouseUp(event) {
 //INPUT
 document.addEventListener("keydown", event => {
     if (!displayMenu) {
-        if (!gamePause) {
+        if (!gamePause && !gunMenu.show) {
             if (!gameOver) {
                 if (event.keyCode == 37 || event.keyCode == 65) {
                     //LEFT
@@ -1114,7 +1264,7 @@ document.addEventListener("keydown", event => {
             }
         }
 
-        if (gamePause)  {
+        if (gamePause || gunMenu.show)  {
             player.dir.up = false;
             player.dir.down = false;
             player.dir.left = false;
@@ -1122,15 +1272,20 @@ document.addEventListener("keydown", event => {
         }
         
         if ((event.keyCode == 80 || event.keyCode == 27) && !gameOver) {
+            gunMenu.show = false;
             gamePause = !gamePause;
         }
         
+        if (event.keyCode == 77  && !gameOver && !gamePause) {
+            gunMenu.show = !gunMenu.show;
+        }
+    
     }
 });
 
 document.addEventListener("keyup", event => {
     if (!displayMenu) {
-        if (!gamePause) {
+        if (!gamePause && !gunMenu.show) {
             if (!gameOver) {
                 if (event.keyCode == 37 || event.keyCode == 65) {
                     //LEFT
@@ -1155,26 +1310,12 @@ document.addEventListener("keyup", event => {
 });
 
 document.addEventListener("click", event => {
-    if (!displayMenu) {
-        if (!gamePause) {
-            if (!gameOver) {
-                
-            } else {
-                if (MouseX <= (menu.buttons.gameBack.x + menu.buttons.gameBack.w) && MouseX >= menu.buttons.gameBack.x &&
-                    MouseY <= (menu.buttons.gameBack.y + menu.buttons.gameBack.h) && MouseY >= menu.buttons.gameBack.y) {
-                    location.reload();
-                }
-            }
-        } else {
-            if (MouseX <= (menu.buttons.gameBack.x + menu.buttons.gameBack.w) && MouseX >= menu.buttons.gameBack.x &&
-                MouseY <= (menu.buttons.gameBack.y + menu.buttons.gameBack.h) && MouseY >= menu.buttons.gameBack.y) {
-                location.reload();
-            }
-        }
-    } else {
+    
+    if (displayMenu) {
         if (MouseX <= (menu.buttons.play.x + menu.buttons.play.w) && MouseX >= menu.buttons.play.x &&
             MouseY <= (menu.buttons.play.y + menu.buttons.play.h) && MouseY >= menu.buttons.play.y) {
             displayMenu = false;
+            wave.display = true;
         }else if (MouseX <= (menu.buttons.quit.x + menu.buttons.quit.w) && MouseX >= menu.buttons.quit.x &&
             MouseY <= (menu.buttons.quit.y + menu.buttons.quit.h) && MouseY >= menu.buttons.quit.y) {
             location.href = "../index.html";
@@ -1185,10 +1326,25 @@ document.addEventListener("click", event => {
             MouseY <= (menu.buttons.back.y + menu.buttons.back.h) && MouseY >= menu.buttons.back.y) {
             howToPlay = false;
         }
-        
+
     }
     
-    //console.log((player.a) * 180 / Math.PI, (player.a / 180 * Math.PI) * 180 / Math.PI);
+    if (!displayMenu && (gamePause || gameOver)) {
+        if (MouseX <= (menu.buttons.gameBack.x + menu.buttons.gameBack.w) && MouseX >= menu.buttons.gameBack.x &&
+                        MouseY <= (menu.buttons.gameBack.y + menu.buttons.gameBack.h) && MouseY >= menu.buttons.gameBack.y) {
+                        location.reload();
+        }
+    }
+        
+        
+        
+    if (!gameOver && !gamePause && !displayMenu) {
+        if (MouseX <= (gunMenu.button.x + gunMenu.button.w) && MouseX >= gunMenu.button.x &&
+            MouseY <= (gunMenu.button.y + gunMenu.button.h) && MouseY >= gunMenu.button.y) {
+            gunMenu.show = !gunMenu.show;
+        }
+    }
+    
 });
 
 function getRandomInt(min, max) {
@@ -1202,5 +1358,7 @@ function genRand(min, max, decimalPlaces) {
     var power = Math.pow(10, decimalPlaces);
     return Math.floor(rand*power) / power;
 }
+
+
 
 update();

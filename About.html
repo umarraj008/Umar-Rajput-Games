@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link href="https://fonts.googleapis.com/css?family=Raleway:100,200,300&display=swap" rel="stylesheet">
+        <link rel="icon" href="logo/favicon.png">
+        <title>Umar Rajput</title>
+        <meta>
+        
+        <style>
+            * {
+                font-family: Raleway;
+                font-weight: 300;
+                margin: 0;
+                padding: 0;
+                color: #fff;
+                cursor: default;
+                overflow: hidden;
+            }
+            
+            body {
+                background: #141414;
+            }
+            
+            br.clear {
+                clear: both;
+            }
+            
+            
+            
+            /* HEADER */
+            header {
+                width: 100%;
+                height: 50px;
+                background: #2b2b2b;
+                justify-content: left;
+                align-items: center;
+                display: flex;
+            }
+            
+            header #logo {
+                height: 100%;
+                margin-left: 5px;
+                float: left;
+            }
+            
+            header #logo:hover {
+                cursor: pointer;
+            }
+            
+            header #titleText {
+                float: left;
+                top: 50%;
+                margin-left: 10px;
+            }
+            
+            header #buttonContainer {
+                margin-left: 20px;
+            }
+            
+            header #button {
+                float: left;
+                margin-left: 10px;
+                margin-right: 10px;
+                width: 70px;
+                height: 30px;
+                text-align: center;
+                transition: 0.2s ease-in-out;
+                cursor: pointer;
+            }
+            
+            header #button:hover {
+                background: #545454;
+                cursor: pointer;
+            }
+            
+            header #button p {
+                padding-top: 5px;
+                cursor: pointer;
+            }
+            
+            
+            /* BODY TITLE*/
+            #title {
+                margin-top: 20px;
+                margin-left: 40px;
+                clear: left;
+            }
+            
+            /* BODY TITLE*/
+            #subtitle {
+                margin-left: 40px;
+                clear: left;
+            }
+            
+            /* ABOUT SECTION */
+            img.me {
+                margin-top: 10px;
+                margin-left: 40px;
+                display: inline-flex;
+            }
+            
+            p.about {
+                font-size: 20px;
+                margin-top: 10px;
+                margin-left: 40px;
+            }
+            
+            /* FOOTER */
+            footer {
+                width: 100%;
+                height: 40px;
+                background: #2b2b2b;
+                justify-content: center;
+                align-content: center;
+                display: flex;
+                position: relative;
+            }
+            
+            footer p {
+                margin-left: 20px;
+                margin-right: 20px;
+                padding-top: 10px;  
+            }
+            
+            footer p.link:hover {
+                text-decoration: underline;
+                cursor: pointer;
+            }
+            
+            #link:hover {
+                cursor: pointer;
+            }
+        </style>
+    </head>
+    <body>
+        <!-- HEADER SECTION -->
+        <header>
+            <img id="logo" src=logo/favicon.png onclick=" location.href='index.html' ">
+            <h1 id="titleText">Umar Rajput</h1>
+            <div id="buttonContainer">
+                <div id="button" onclick=" location.href='index.html' "><p>Home</p></div>
+                <div id="button" onclick=" location.href='about.html' "><p>About</p></div>
+            </div>
+        </header>
+        
+        <!-- About Section -->
+        <div class="contentContainer" id="contentContainer">
+            <h1 id="title">About</h1>
+            <img src="MenuImages/me.JPG" class="me" height="200px">
+            <p class="about">This website is to showcase my projects that I have created over the years.</p>
+            <br>
+            <img class="me" src="MenuImages/github.png" height="200px">
+            <p class="about">My Github: <a id="link" href="https://github.com/umarraj008">umarraj008</a></p>
+            <p class="about">Website Repository: <a id="link" href="https://github.com/umarraj008/umarraj008.github.io">umarraj008.github.io</a></p>
+                        
+        </div>
+    </body>
+</html>
