@@ -4,8 +4,6 @@
         <link href="https://fonts.googleapis.com/css?family=Raleway:100,200,300&display=swap" rel="stylesheet">
         <link rel="icon" href="logo/favicon.png">
         <title>Umar Rajput</title>
-        <meta>
-        
         <style>
             * {
                 font-family: Raleway;
@@ -92,17 +90,17 @@
                 clear: left;
             }
             
-            /* ABOUT SECTION */
-            img.me {
-                margin-top: 10px;
-                margin-left: 40px;
-                display: inline-flex;
-            }
+            /* TEXT SECTION */
             
-            p.about {
+            p.text {
                 font-size: 20px;
                 margin-top: 10px;
                 margin-left: 40px;
+            }
+            
+            hr {
+                margin-left: 40px;
+                margin-right: 40px;;
             }
             
             /* FOOTER */
@@ -143,17 +141,36 @@
                 <div id="button" onclick=" location.href='updates.html' "><p>Updates</p></div>
             </div>
         </header>
-        
+
         <!-- About Section -->
         <div class="contentContainer" id="contentContainer">
-            <h1 id="title">About</h1>
-            <img src="MenuImages/me.JPG" class="me" height="200px">
-            <p class="about">This website is to showcase my projects that I have created over the years.</p>
-            <br>
-            <img class="me" src="MenuImages/github.png" height="200px">
-            <p class="about">My Github: <a id="link" href="https://github.com/umarraj008">umarraj008</a></p>
-            <p class="about">Website Repository: <a id="link" href="https://github.com/umarraj008/umarraj008.github.io">umarraj008.github.io</a></p>
-                        
+            <h1 id="title"><center>Updates</center></h1>
         </div>
+        
+        <script>
+            var text = "07/12/2020,-Added computer to gamemode 1 to x and o.,-Updated gameplay to x and o.,-Added new background to x and o.,#06/12/2020,-Added homepage main title.,-Updated homepage background.,-Created the update page on homepage.,-Created a new version of X and O.,-Created a global splahscreen class.,-Created a global button class.,#02/12/2020,-Created a new version of homepage.,-Created an about page to homepage.,";
+            
+            var body = document.getElementById("contentContainer");
+            var logs = text.split("#");
+            var item;
+
+            for (let i = 0; i < logs.length; i++) {
+                item = logs[i].split(",");
+                    
+                var h1 = document.createElement("h1");
+                h1.id = "title";
+                h1.innerHTML = item[0];
+                body.append(h1);
+                
+                for (let t = 1; t < item.length; t++) {
+                    var p = document.createElement("p");
+                    p.className = "text";
+                    p.innerHTML = item[t];
+                    body.append(p);
+                }
+                
+                body.append(document.createElement("hr"));
+            }
+        </script>
     </body>
 </html>
