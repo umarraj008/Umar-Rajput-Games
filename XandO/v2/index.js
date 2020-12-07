@@ -41,7 +41,7 @@ class part {
     }
 }
 
-splashScreen.isEnded = true; //////////DEBUG
+splashScreen.isEnded = false; //////////DEBUG
 function startup() {
     var script = document.createElement("script")
     script.src= "Game.js";
