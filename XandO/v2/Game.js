@@ -13,6 +13,7 @@ class Game {
         this.winnerType = "";
         this.gameMode = gameMode;
         this.gameOverAlpha = 0;
+        this.canContinue = true;
         this.turnCount = 0;
         this.restartButton = new Button(ctx);
         this.btmButton = new Button(ctx);
@@ -35,6 +36,7 @@ class Game {
         
         //starter functions
         this.chooseStarter();
+        console.clear();
     }
     
     draw() {
@@ -176,12 +178,16 @@ class Game {
                     this.ctx.fillText("Player 2 Wins!", this.c.width/2, this.c.height/2-70);
                 } else if (this.gameMode == 1) {
                     this.ctx.fillText("Computer Wins!", this.c.width/2, this.c.height/2-70);
+                } else if (this.gameMode == 3 || this.gameMode == 4) {
+                    this.ctx.fillText("Computer 2 Wins!", this.c.width/2, this.c.height/2-70);
                 }
             } else if (this.winner == "o") {
                 if (this.gameMode == 2) {
                     this.ctx.fillText("Player 1 Wins!", this.c.width/2, this.c.height/2-70);
                 } else if (this.gameMode == 1) {
                     this.ctx.fillText("You Win!", this.c.width/2, this.c.height/2-70);
+                } else if (this.gameMode == 3 || this.gameMode == 4) {
+                    this.ctx.fillText("Computer 1 Win!", this.c.width/2, this.c.height/2-70);
                 }
             } else if (this.winner == "draw") {
                 
@@ -193,9 +199,46 @@ class Game {
         }
         
         
-        //computer
+        //computer gamemode 1
         if (this.gameMode == 1 && !this.player1turn && !this.gameOver) {
-            let move = this.pickTurn();
+            let moveSet = this.pickTurn();
+            let move = null;
+             
+            console.log("COMPUTER: " + moveSet.length + " MOVES CALCULATED");
+            
+            let count = {win: 0, block: 0, corner: 0, middle: 0, side: 0};
+            for (let i = 0; i < moveSet.length; i++) {
+                if (moveSet[i].type == "win") {
+                    count.win++;
+                } else if (moveSet[i].type == "block") {
+                    count.block++;
+                } else if (moveSet[i].type == "corner") {
+                    count.corner++;
+                } else if (moveSet[i].type == "middle") {
+                    count.middle++;
+                } else if (moveSet[i].type == "side") {
+                    count.side++;
+                } 
+            }
+            
+            if (count.win >= 1) {
+                move = "win";
+            } else if (count.block >= 1) {
+                move = "block";
+            } else if (count.corner >= 1) {
+                move = "corner";
+            } else if (count.middle >= 1) {
+                move = "middle";
+            } else if (count.side >= 1) {
+                move = "side";
+            }
+            
+            for (let i = 0; i < moveSet.length; i++) {
+                if (moveSet[i].type == move) {
+                    move = moveSet[i].mov;
+                    break;
+                }
+            }
             
             let iix;
             let iiy;
@@ -248,31 +291,233 @@ class Game {
                     break;
             }
 
-            if (this.turnCount == 0) {
-                let v1;
-                let v2;
-                if (Math.random < 0.5) {
-                    v1 = 0;
-                } else {
-                    v1 = 2;
-                }
-                
-                if (Math.random < 0.5) {
-                    v2 = 0;
-                } else {
-                    v2 = 2;
-                }
-                
-                this.board[v1][v2] = "x";
-            } else {
-                this.board[iiy][iix] = "x";
-            }
+//            if (this.turnCount == 0) {
+//                let v1;
+//                let v2;
+//                if (Math.random < 0.5) {
+//                    v1 = 0;
+//                } else {
+//                    v1 = 2;
+//                }
+//                
+//                if (Math.random < 0.5) {
+//                    v2 = 0;
+//                } else {
+//                    v2 = 2;
+//                }
+//                
+//                this.board[v1][v2] = "x";
+//            } else {
+//                this.board[iiy][iix] = "x";
+//            }
             //console.log("COMPUTER MOVED TO: ", move, "(" + iix + "," + iiy + ")");
             
             
+            this.board[iiy][iix] = "x";
             this.player1turn = true;
             this.checkBoard();
         }
+        
+        //computer gamemode 3 o
+        if ((this.gameMode == 3 || this.gameMode == 4) && this.player1turn && !this.gameOver && this.canContinue) {
+            let moveSet = this.pickTurn2();
+            let move = null;
+             
+            console.log("COMPUTER O: " + moveSet.length + " MOVES CALCULATED");
+            
+            let count = {win: 0, block: 0, corner: 0, middle: 0, side: 0};
+            for (let i = 0; i < moveSet.length; i++) {
+                if (moveSet[i].type == "win") {
+                    count.win++;
+                } else if (moveSet[i].type == "block") {
+                    count.block++;
+                } else if (moveSet[i].type == "corner") {
+                    count.corner++;
+                } else if (moveSet[i].type == "middle") {
+                    count.middle++;
+                } else if (moveSet[i].type == "side") {
+                    count.side++;
+                } 
+            }
+            
+            if (count.win >= 1) {
+                move = "win";
+            } else if (count.block >= 1) {
+                move = "block";
+            } else if (count.corner >= 1) {
+                move = "corner";
+            } else if (count.middle >= 1) {
+                move = "middle";
+            } else if (count.side >= 1) {
+                move = "side";
+            }
+            
+            for (let i = 0; i < moveSet.length; i++) {
+                if (moveSet[i].type == move) {
+                    move = moveSet[i].mov;
+                    break;
+                }
+            }
+            
+            let iix;
+            let iiy;
+
+            //get move index on board
+            switch (move) {
+                case 0:
+                    iix = 0;
+                    iiy = 0;
+                    break;
+
+                case 1:
+                    iix = 1;
+                    iiy = 0;
+                    break;
+
+                case 2:
+                    iix = 2;
+                    iiy = 0;
+                    break;
+
+                case 3:
+                    iix = 0;
+                    iiy = 1;
+                    break;
+
+                case 4:
+                    iix = 1;
+                    iiy = 1;
+                    break;
+
+                case 5:
+                    iix = 2;
+                    iiy = 1;
+                    break;
+
+                case 6:
+                    iix = 0;
+                    iiy = 2;
+                    break;
+
+                case 7:
+                    iix = 1;
+                    iiy = 2;
+                    break;
+
+                case 8:
+                    iix = 2;
+                    iiy = 2;
+                    break;
+            }
+            this.turnCount++;
+            if (this.gameMode == 3) {
+                this.canContinue = false;
+            }
+            this.board[iiy][iix] = "o";
+            this.player1turn = false;
+            this.checkBoard();
+        }
+     
+        //computer gamemode 3 x
+        if ((this.gameMode == 3 || this.gameMode == 4) && !this.player1turn && !this.gameOver && this.canContinue) {
+            let moveSet = this.pickTurn();
+            let move = null;
+            console.log("COMPUTER X: " + moveSet.length + " MOVES CALCULATED");
+            
+            let count = {win: 0, block: 0, corner: 0, middle: 0, side: 0};
+            for (let i = 0; i < moveSet.length; i++) {
+                if (moveSet[i].type == "win") {
+                    count.win++;
+                } else if (moveSet[i].type == "block") {
+                    count.block++;
+                } else if (moveSet[i].type == "corner") {
+                    count.corner++;
+                } else if (moveSet[i].type == "middle") {
+                    count.middle++;
+                } else if (moveSet[i].type == "side") {
+                    count.side++;
+                } 
+            }
+            
+            if (count.win >= 1) {
+                move = "win";
+            } else if (count.block >= 1) {
+                move = "block";
+            } else if (count.corner >= 1) {
+                move = "corner";
+            } else if (count.middle >= 1) {
+                move = "middle";
+            } else if (count.side >= 1) {
+                move = "side";
+            }
+            
+            for (let i = 0; i < moveSet.length; i++) {
+                if (moveSet[i].type == move) {
+                    move = moveSet[i].mov;
+                    break;
+                }
+            }
+            
+            let iix;
+            let iiy;
+
+            //get move index on board
+            switch (move) {
+                case 0:
+                    iix = 0;
+                    iiy = 0;
+                    break;
+
+                case 1:
+                    iix = 1;
+                    iiy = 0;
+                    break;
+
+                case 2:
+                    iix = 2;
+                    iiy = 0;
+                    break;
+
+                case 3:
+                    iix = 0;
+                    iiy = 1;
+                    break;
+
+                case 4:
+                    iix = 1;
+                    iiy = 1;
+                    break;
+
+                case 5:
+                    iix = 2;
+                    iiy = 1;
+                    break;
+
+                case 6:
+                    iix = 0;
+                    iiy = 2;
+                    break;
+
+                case 7:
+                    iix = 1;
+                    iiy = 2;
+                    break;
+
+                case 8:
+                    iix = 2;
+                    iiy = 2;
+                    break;
+            }
+            this.turnCount++;
+            if (this.gameMode == 3) {
+                this.canContinue = false;
+            }
+            this.board[iiy][iix] = "x";
+            this.player1turn = true;
+            this.checkBoard();
+        }
+     
+        
     }
         
     pickTurn() {
@@ -282,6 +527,8 @@ class Game {
         //place in corner
         //place in middle
         //place random
+        
+        var moves = [];
         
         //test each 9 possible moves
         for(let i = 0; i < 9; i++) {
@@ -363,15 +610,14 @@ class Game {
                     lines[b].forEach(function(t) { count[t] = (count[t]||0) + 1;});
                     //can win
                     if (count.x == 2 && count.turn == 1) {
-                        console.log("COMPUTER: winning move: " + i);
-                        return i;
+                        //console.log("COMPUTER: winning move: " + i);
+                        moves.push({type: "win", mov: i});
                     }
                     
                     //player block
                     if (count.o == 2 && count.turn == 1) {
-                        console.log("COMPUTER: player block: " + i);
-                        console.log(lines[b], b, i);
-                        return i;
+                        //console.log("COMPUTER: player block: " + i);
+                        moves.push({type: "block", mov: i});
                     }
                 }    
             }
@@ -381,30 +627,212 @@ class Game {
         let testMove = [[...this.board[0]], [...this.board[1]], [...this.board[2]]];
         
         if (testMove[0][0] == 0) {
-            console.log("COMPUTER: corner move 1: " + 0);
-            return 0;
-        } else if (testMove[2][0] == 0) {
-            console.log("COMPUTER: corner move 2: " + 6);
-            return 6;
-        } else if (testMove[0][2] == 0) {
-            console.log("COMPUTER: corner move 3: " + 2);
-            return 2;
-        } else if (testMove[2][2] == 0) {
-            console.log("COMPUTER: corner move 4: " + 8);
-            return 8;
+            //console.log("COMPUTER: corner move 1: " + 0);
+            moves.push({type: "corner", mov: 0});
+        }
+        
+        if (testMove[2][0] == 0) {
+            //console.log("COMPUTER: corner move 2: " + 6);
+            moves.push({type: "corner", mov: 6});
+        }
+        
+        if (testMove[0][2] == 0) {
+            //console.log("COMPUTER: corner move 3: " + 2);
+            moves.push({type: "corner", mov: 2});
+        }
+        
+        if (testMove[2][2] == 0) {
+            //console.log("COMPUTER: corner move 4: " + 8);
+            moves.push({type: "corner", mov: 8});
         }
 
         //place in middle if no turn
         if (testMove[1][1] == 0) {
-            console.log("COMPUTER: placed in middle: " + 4);
-            return 4;
+            //console.log("COMPUTER: placed in middle: " + 4);
+            moves.push({type: "middle", mov: 4});
         }
         
-        let val = this.getRndInteger(0,8);
-        console.log("COMPUTER: random move: " + val);
-        return val;
-
+        
+        if (testMove[0][1] == 0) {
+            //console.log("COMPUTER: placed in middle: " + 4);
+            moves.push({type: "side", mov: 1});
+        }
+        
+        if (testMove[1][0] == 0) {
+            //console.log("COMPUTER: placed in middle: " + 4);
+            moves.push({type: "side", mov: 3});
+        }
+        
+        if (testMove[1][2] == 0) {
+            //console.log("COMPUTER: placed in middle: " + 4);
+            moves.push({type: "side", mov: 5});
+        }
+        
+        if (testMove[2][1] == 0) {
+            //console.log("COMPUTER: placed in middle: " + 4);
+            moves.push({type: "side", mov: 7});
+        }
+        
+        return moves;
     }
+    
+    
+    pickTurn2() {
+        
+        //see if can win
+        //check if player about to win
+        //place in corner
+        //place in middle
+        //place random
+        
+        var moves = [];
+        
+        //test each 9 possible moves
+        for(let i = 0; i < 9; i++) {
+            let testMove = [[...this.board[0]], [...this.board[1]], [...this.board[2]]];
+            let ix;
+            let iy;
+            
+            //get move index on board
+            switch (i) {
+                case 0:
+                    ix = 0;
+                    iy = 0;
+                    break;
+                
+                case 1:
+                    ix = 1;
+                    iy = 0;
+                    break;
+                
+                case 2:
+                    ix = 2;
+                    iy = 0;
+                    break;
+                
+                case 3:
+                    ix = 0;
+                    iy = 1;
+                    break;
+                
+                case 4:
+                    ix = 1;
+                    iy = 1;
+                    break;
+                
+                case 5:
+                    ix = 2;
+                    iy = 1;
+                    break;
+                
+                case 6:
+                    ix = 0;
+                    iy = 2;
+                    break;
+                
+                case 7:
+                    ix = 1;
+                    iy = 2;
+                    break;
+                    
+                case 8:
+                    ix = 2;
+                    iy = 2;
+                    break;
+            }
+            
+            //test the move
+            if (testMove[iy][ix] == 0) {
+                
+                //place test move
+                testMove[iy][ix] = "turn";
+                
+                //check each line
+                let lines = [];
+                lines.push([testMove[0][0], testMove[0][1], testMove[0][2]]);//-----
+                lines.push([testMove[1][0], testMove[1][1], testMove[1][2]]);
+                lines.push([testMove[2][0], testMove[2][1], testMove[2][2]]);
+                
+                lines.push([testMove[0][0], testMove[1][0], testMove[2][0]]);// |
+                lines.push([testMove[0][1], testMove[1][1], testMove[2][1]]);// |
+                lines.push([testMove[0][2], testMove[1][2], testMove[2][2]]);// |
+                
+                lines.push([testMove[0][2], testMove[1][1], testMove[2][0]]);// /
+                lines.push([testMove[0][0], testMove[1][1], testMove[2][2]]);// \
+                
+                
+                //check if the player blocking move is good
+                for (let b = 0; b < lines.length; b++) {
+                    let count = {x: 0, turn: 0, o: 0};
+                    lines[b].forEach(function(t) { count[t] = (count[t]||0) + 1;});
+                    //can win
+                    if (count.o == 2 && count.turn == 1) {
+                        //console.log("COMPUTER: winning move: " + i);
+                        moves.push({type: "win", mov: i});
+                    }
+                    
+                    //player block
+                    if (count.x == 2 && count.turn == 1) {
+                        //console.log("COMPUTER: player block: " + i);
+                        moves.push({type: "block", mov: i});
+                    }
+                }    
+            }
+        }
+
+        //place in corner if no turn
+        let testMove = [[...this.board[0]], [...this.board[1]], [...this.board[2]]];
+        
+        if (testMove[0][0] == 0) {
+            //console.log("COMPUTER: corner move 1: " + 0);
+            moves.push({type: "corner", mov: 0});
+        }
+        
+        if (testMove[2][0] == 0) {
+            //console.log("COMPUTER: corner move 2: " + 6);
+            moves.push({type: "corner", mov: 6});
+        }
+        
+        if (testMove[0][2] == 0) {
+            //console.log("COMPUTER: corner move 3: " + 2);
+            moves.push({type: "corner", mov: 2});
+        }
+        
+        if (testMove[2][2] == 0) {
+            //console.log("COMPUTER: corner move 4: " + 8);
+            moves.push({type: "corner", mov: 8});
+        }
+
+        //place in middle if no turn
+        if (testMove[1][1] == 0) {
+            //console.log("COMPUTER: placed in middle: " + 4);
+            moves.push({type: "middle", mov: 4});
+        }
+        
+        
+        if (testMove[0][1] == 0) {
+            //console.log("COMPUTER: placed in middle: " + 4);
+            moves.push({type: "side", mov: 1});
+        }
+        
+        if (testMove[1][0] == 0) {
+            //console.log("COMPUTER: placed in middle: " + 4);
+            moves.push({type: "side", mov: 3});
+        }
+        
+        if (testMove[1][2] == 0) {
+            //console.log("COMPUTER: placed in middle: " + 4);
+            moves.push({type: "side", mov: 5});
+        }
+        
+        if (testMove[2][1] == 0) {
+            //console.log("COMPUTER: placed in middle: " + 4);
+            moves.push({type: "side", mov: 7});
+        }
+        
+        return moves;
+    }
+    
     
     findSpotClicked(ox, oy) {
         for (let y = 0; y < this.board.length; y++) {

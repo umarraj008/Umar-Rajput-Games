@@ -260,6 +260,20 @@ window.onkeydown = function(e) {
     if (!splashScreen.isEnded && (event.keyCode == "27" || e.keyCode == "32" || e.keyCode == "13")) {
         splashScreen.isEnded = true;
     }
+    
+    if (state == 1) {
+        if (e.keyCode == "66") {
+            game = new Game(ctx, c, 3);
+            state = 2;
+        } else if (e.keyCode == "78") {
+            game = new Game(ctx, c, 4);
+            state = 2;
+        }
+    } if (state == 2) {
+        if (e.keyCode == "13") {
+            game.canContinue = true;
+        }
+    }
 } 
 
 window.onmousemove = function(event) {
@@ -326,6 +340,7 @@ window.onclick = function(e) {
                     state = 1;
                 }
             }
+            
             break;
     }
 }
