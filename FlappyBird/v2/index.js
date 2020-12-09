@@ -12,12 +12,17 @@ var buttons = [];
 var mountain = [];
 let t = 0; 
 var ty = 0;
+var transY = c.height;
+var transis = false;
 let counter = 0; 
 var game = new Game();
 splashScreen.isEnded = false; //////////DEBUG
 
 function startup() {
     birdImg = document.getElementById("birdImg");
+    pipeImg = document.getElementById("pipeImg");
+    circleNoImg = document.getElementById("circleNoImg");
+    circleShadeImg = document.getElementById("circleShadeImg");
     resizeWindow();
     buttonSetup();
     update();
@@ -109,13 +114,23 @@ function menuDraw() {
     ctx.drawImage(birdImg, c.width*0.5-300, c.height/2-300, 600,600)
     
     //dev text
-    ctx.fillStyle = "red";
-    ctx.font = "50px Raleway";
-    ctx.fillText("GAME IS IN DEVELOPMENT", c.width/2, c.height-100);
+    //ctx.fillStyle = "red";
+    //ctx.font = "50px Raleway";
+    //ctx.fillText("GAME IS IN DEVELOPMENT", c.width/2, c.height-100);
     
     //buttons
     buttons.playButton.draw(mouseX, mouseY);
     buttons.quitButton.draw(mouseX, mouseY);
+    
+    if (transis) {
+        ctx.fillStyle ="black";
+        ctx.fillRect(0,0,c.width,transY);
+        
+        transY -= 2 * dt;
+        if (transY <= 0) {
+            transis = false;
+        }
+    }
 }
 
 function selectionDraw() {
@@ -146,22 +161,39 @@ function buttonSetup() {
     let playButton = new Button(ctx);
     let quitButton = new Button(ctx);
     
-    playButton.setBackground("#29adff");
-    playButton.setHighlight("#80ceff");
-    playButton.setOutline("#095d99");
-    playButton.setOutlineWidth("4");
-    playButton.setText("Play");
+    //play button
     playButton.setPos(20, c.height/2-75);
     playButton.setDimentions(300, 150);
     
-    quitButton.setBackground("#29adff");
-    quitButton.setHighlight("#80ceff");
-    quitButton.setOutline("#095d99");
-    quitButton.setOutlineWidth("4");
-    quitButton.setText("Quit");
+    let buttonGradient = ctx.createLinearGradient(0, playButton.y, 0, playButton.y + 150);
+    let buttonGradient2 = ctx.createLinearGradient(0, playButton.y + 150, 0, playButton.y);
+    buttonGradient.addColorStop(0, "#34ebd2");
+    buttonGradient.addColorStop(1, "#198a7a");
+    buttonGradient2.addColorStop(0, "#34ebd2");
+    buttonGradient2.addColorStop(1, "#198a7a");
+    playButton.setBackground(buttonGradient);
+    playButton.setHighlight(buttonGradient2);
+    playButton.setOutline("#095d99");
+    playButton.setOutlineWidth("4");
+    playButton.setText("Play");
+    
+    //quit button
     quitButton.setPos(20, c.height/2+95);
     quitButton.setDimentions(300, 150);
     
+    buttonGradient = ctx.createLinearGradient(0, quitButton.y, 0, quitButton.y + 150);
+    buttonGradient2 = ctx.createLinearGradient(0, quitButton.y + 150, 0, quitButton.y);
+    buttonGradient.addColorStop(0, "#34ebd2");
+    buttonGradient.addColorStop(1, "#198a7a");
+    buttonGradient2.addColorStop(0, "#34ebd2");
+    buttonGradient2.addColorStop(1, "#198a7a");
+    quitButton.setBackground(buttonGradient);
+    quitButton.setHighlight(buttonGradient2);
+    quitButton.setOutline("#095d99");
+    quitButton.setOutlineWidth("4");
+    quitButton.setText("Quit");
+    
+    //add buttons
     buttons.playButton = playButton;
     buttons.quitButton = quitButton;
 }
@@ -182,6 +214,19 @@ window.onkeydown = function(e) {
     if (!splashScreen.isEnded && (event.keyCode == "27" || e.keyCode == "32" || e.keyCode == "13")) {
         splashScreen.isEnded = true;
     }
+    
+    if (state == 2) {
+        if (e.keyCode == 32 || e.keyCode == 38 || e.keyCode == 79) {
+            if (!game.started) {
+                game.started = true;
+                if (e.keyCode == 79) {
+                    game.ai = true;
+                }
+            }
+            
+            game.jump();
+        }
+    }
 } 
 
 window.onmousemove = function(event) {
@@ -200,12 +245,32 @@ window.onclick = function(e) {
     switch (state) {
         case 0:
             if (buttons.playButton.clicked(mouseX, mouseY)) {
+                game = new Game();
                 state = 1;
                 break;
             } else if (buttons.quitButton.clicked(mouseX, mouseY)) {
                 location.href = "../../index.html";
                 break;
             }
+            break;
+            
+        case 2:
+            if (!game.started) {
+                game.started = true;
+            }
+            
+            if (!game.gameOver) {
+                game.jump();
+            }
+            
+            if (game.gameOver) {
+                if (game.playAgainButton.clicked(mouseX, mouseY)) {
+                    game.playAgain = true;
+                } else if (game.menuButton.clicked(mouseX, mouseY)) {
+                    game.quit = true;
+                }
+            }
+            
             break;
     }
 }
