@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <link href="https://fonts.googleapis.com/css?family=Raleway:100,200,300&display=swap" rel="stylesheet">
         <link rel="icon" href="logo/favicon.png">
+        <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,700&display=swap" rel="stylesheet">
         <title>Umar Rajput</title>
         <style>
             * {
-                font-family: Raleway;
+                font-family: Roboto;
                 font-weight: 300;
                 margin: 0;
                 padding: 0;
@@ -76,8 +76,8 @@
             }
             
             
-            /* BODY TITLE*/
-            #title {
+            /* BODY TITLE the dates */
+            #title { 
                 margin-top: 20px;
                 margin-left: 40px;
                 clear: left;
@@ -101,6 +101,39 @@
                 margin-left: 40px;
                 margin-right: 40px;;
             }
+            
+            .boldText0 {
+                background: orange;
+            }
+            
+            .boldText1 {
+                background: #29adff;
+            }
+            
+            .boldText2 {
+                background: red;
+            }
+            
+            .boldText3 {
+                background: yellow;
+            }
+            
+            .boldText4 {
+                background: white;
+            }
+            
+            .boldText5 {
+                background: white;
+            }
+            
+            .boldText6 {
+                background: white;
+            }
+            
+            .boldText7 {
+                background: seagreen;
+            }
+            
             
             /* FOOTER */
             footer {
@@ -152,7 +185,7 @@
         <br>
         
         <script>
-            var text = "09/12/2020,-Added homepage transition.,-Updated graphics on flappy bird.,-Finished gameplay on flappy bird.,#08/12/2020,-Updated computer on x and o.,-Created new version of flappy bird.,#07/12/2020,-Added computer to gamemode 1 to x and o.,-Updated gameplay to x and o.,-Added new background to x and o.,#06/12/2020,-Added homepage main title.,-Updated homepage background.,-Created the update page on homepage.,-Created a new version of X and O.,-Created a global splahscreen class.,-Created a global button class.,#02/12/2020,-Created a new version of homepage.,-Created an about page to homepage.,";
+            var text = "[12/12/2020],[7Shooting Game]| Shooting improved.,[7Shooting Game]| Added character animation.,[7Shooting Game]| Added character textures.,[7Shooting Game]| Added ground texture.,#[11/12/2020],[7Shooting Game]| Created new shooter game,#[09/12/2020],[0Homepage]| Added transition.,[2Flappy Bird]| Updated graphics.,[2Flappy Bird]| Finished gameplay.,#[08/12/2020],[1X and O]| Updated computer on x and o.,[2Flappy Bird]| Created new version of flappy bird.,#[07/12/2020],[1X and O]| Added computer to gamemode 1.,[1X and O]| Updated gameplay.,[1X and O]| Added new background.,#[06/12/2020],[0Homepage]| Added main title.,[0Homepage]| Updated background.,[0Homepage]| Created the update page.,[1X and O]| Created a new version of X and O.,[0Homepage]| Created a splahscreen.,#[02/12/2020],[0Homepage]| Created an about page.,";
             
             var body = document.getElementById("contentContainer");
             var logs = text.split("#");
@@ -160,17 +193,26 @@
 
             for (let i = 0; i < logs.length; i++) {
                 item = logs[i].split(",");
-                    
+                   
                 var h1 = document.createElement("h1");
                 h1.id = "title";
                 h1.innerHTML = item[0];
                 body.append(h1);
                 
                 for (let t = 1; t < item.length; t++) {
-                    var p = document.createElement("p");
+                    let final = item[t].split("|");
+                    
+                    let p = document.createElement("p");
+                    let b = document.createElement("b");
+                    
                     p.className = "text";
-                    p.innerHTML = item[t];
+                    b.className = "boldText" + final[0].charAt(1);
+                    b.innerHTML = (final[0] != "") ? "[" + final[0].substr(2) : "";
+                    p.innerHTML = (final[1] != undefined) ? final[1] : "";
+                    p.prepend(b);
+                    
                     body.append(p);
+                    
                 }
                 
                 body.append(document.createElement("hr"));

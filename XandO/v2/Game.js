@@ -137,7 +137,7 @@ class Game {
                         this.ctx.fillStyle = "red";
                     }
                     this.ctx.textAlign = "center";
-                    this.ctx.font = "200px Raleway";
+                    this.ctx.font = "200px Roboto";
                     this.ctx.fillText(this.board[y][x], px+100, py+155);
                 }
             }
@@ -145,7 +145,7 @@ class Game {
         
         //player text
         this.ctx.fillStyle = "black";
-        this.ctx.font = "50px Raleway";
+        this.ctx.font = "50px Roboto";
         let text = "";
         if (this.player1turn && this.gameMode == 2) {
             text = "Player 1's Turn";
@@ -172,7 +172,7 @@ class Game {
             
             //text
             this.ctx.fillStyle = "white";
-            this.ctx.font = "70px Raleway";
+            this.ctx.font = "70px Roboto";
             if (this.winner == "x") {
                 if (this.gameMode == 2) {
                     this.ctx.fillText("Player 2 Wins!", this.c.width/2, this.c.height/2-70);

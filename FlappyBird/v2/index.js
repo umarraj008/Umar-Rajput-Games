@@ -71,7 +71,7 @@ function menuDraw() {
     //title
     ctx.fillStyle = "black";
     ctx.textAlign = "center";
-    ctx.font = "140px Raleway";
+    ctx.font = "140px Roboto";
     ctx.fillText("Flappy Bird", c.width/2, 150);
     
     
@@ -115,7 +115,7 @@ function menuDraw() {
     
     //dev text
     //ctx.fillStyle = "red";
-    //ctx.font = "50px Raleway";
+    //ctx.font = "50px Roboto";
     //ctx.fillText("GAME IS IN DEVELOPMENT", c.width/2, c.height-100);
     
     //buttons

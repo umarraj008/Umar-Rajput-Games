@@ -1,7 +1,7 @@
 <html>
     <head>
-        <title>Flappy Bird</title>
-        <link rel="icon" href="../../logo/favicon.png">
+        <title></title>
+        <link rel="icon" href="../logo/favicon.png">
         <meta charset="UTF-8">
         <meta name="author" content="Umar Rajput">
 		<link href="https://fonts.googleapis.com/css?family=Roboto:300,400,700&display=swap" rel="stylesheet">
@@ -15,8 +15,7 @@
             * {
                 margin: 0;
                 padding: 0;
-                font-family: "Roboto";
-                user-select: none;
+                font-family: "Raleway";
             }
             
             canvas {
@@ -31,13 +30,11 @@
         </style>
     </head>
     <body>
-        <img src="berd.png" id="birdImg" height="0" />
-        <img src="pipe.png" id="pipeImg" height="0" />
-        <img src="pipeCircleNo.png" id="circleNoImg" height="0" />
-        <img src="pipeCircleV2.png" id="circleShadeImg" height="0" />
 		<canvas id="canvas" width="1920" height="1080"></canvas>
-        <script src="../../lib/jsClasses/SplashScreen.js"></script>
-        <script src="../../lib/jsClasses/Button.js"></script>
+        <script src="../lib/jsClasses/SplashScreen.js"></script>
+        <script src="../lib/jsClasses/Button.js"></script>
+        <script src="Player.js"></script>
+        <script src="Zombie.js"></script>
         <script src="Game.js"></script>
         <script src="index.js"></script>
     </body>

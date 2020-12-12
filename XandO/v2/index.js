@@ -85,7 +85,7 @@ function menuDraw() {
         } else if (parts[i].type == "o") {
             ctx.fillStyle = "#29adff";
         }
-        ctx.font = "30px Raleway";
+        ctx.font = "30px Roboto";
         ctx.fillText(parts[i].type, parts[i].x, parts[i].y);
         
         
@@ -100,7 +100,7 @@ function menuDraw() {
     }
     
     //title
-    ctx.font = "140px Raleway";
+    ctx.font = "140px Roboto";
     ctx.textAlign = "center";
     
     //ctx.fillStyle = "lime";
@@ -134,7 +134,7 @@ function selectionDraw() {
         } else if (parts2[i].type == "o") {
             ctx.fillStyle = "#29adff";
         }
-        ctx.font = "30px Raleway";
+        ctx.font = "30px Roboto";
         ctx.fillText(parts2[i].type, parts2[i].x, parts2[i].y);
         
         //move
@@ -172,12 +172,12 @@ function selectionDraw() {
     
     //title
     ctx.fillStyle = "black";
-    ctx.font = "140px Raleway";
+    ctx.font = "140px Roboto";
     ctx.fillText("Select Gamemode", c.width/2, c.height/2-100);
     
     //description text
     ctx.fillStyle = "black";
-    ctx.font = "30px Raleway";
+    ctx.font = "30px Roboto";
     ctx.textAlign = "center";
     ctx.fillText("Play against the computer!", c.width/4, c.height/2+250);
     ctx.fillText("Play against a friend!", c.width*0.75, c.height/2+250);

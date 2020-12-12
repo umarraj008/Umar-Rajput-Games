@@ -182,7 +182,7 @@ class Game {
         //score text
         if (!this.gameOver) {
             ctx.fillStyle = "black";
-            ctx.font = "100px Raleway";
+            ctx.font = "100px Roboto";
             ctx.fillText(this.score, c.width/2, 100);            
         }
         
@@ -202,16 +202,16 @@ class Game {
         //ui started text
         if (!this.started) {
             ctx.fillStyle = "black";
-            ctx.font = "50px Raleway";
+            ctx.font = "50px Roboto";
             ctx.fillText("Press Space or Click to Start!", c.width/2, c.height/2-100);
         }
         
         //game over text
         if (this.gameOver) {
             ctx.fillStyle = "black";
-            ctx.font = "70px Raleway";
+            ctx.font = "70px Roboto";
             ctx.fillText("Game Over", c.width/2, c.height/2);
-            ctx.font = "50px Raleway";
+            ctx.font = "50px Roboto";
             ctx.fillText("Score: " + this.score, c.width/2, c.height/2+50);
             
             //button
