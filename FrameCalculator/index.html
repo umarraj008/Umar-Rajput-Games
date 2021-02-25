@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Frame Calculator</title>
+        <style>
+            * {
+                font-family: arial;
+            }
+            
+            div {
+                float:left;
+                
+            }
+            
+            div#leftOne {
+                margin-right: 170px;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Frame Calculator</h1>
+        <form>
+            <input type="text" id="sf" placeholder="Enter Start Frame"   onkeyup="recalculate()">
+            <input type="text" id="ef" placeholder="Enter End Frame"     onkeyup="recalculate()">
+            <input type="text" id="cf" placeholder="Enter Current Frame" onkeyup="recalculate()">
+            <input type="text" id="t"  placeholder="Enter Time"          onkeyup="recalculate()">
+            <br>
+            <input type="button" id="clear" value="Clear All" style="margin-top: 5px">
+        </form>
+        <br>
+        <div id="leftOne">
+            <h2>Full Render Time</h2>
+            <p id="frTF">Total Frames: </p>
+            <p id="frD">Days: </p>
+            <p id="frH">Hours: </p>
+            <p id="frM">Minutes: </p>
+            <p id="frS">Seconds: </p>
+        </div>
+        
+        <div>
+            <h2>Time left</h2>
+            <p id="tlFL">Frames Left: </p>
+            <p id="tlD">Days: </p>
+            <p id="tlH">Hours: </p>
+            <p id="tlM">Minutes: </p>
+            <p id="tlS">Seconds: </p>
+        </div>
+        <script>
+            var startFrameInp = document.getElementById("sf");
+            var endFrameInp = document.getElementById("ef");
+            var currentFrameInp = document.getElementById("cf");
+            var timeInp = document.getElementById("t");
+            
+            var fullRenderDaysOutput= document.getElementById("frD");
+            var fullRenderHourOutput = document.getElementById("frH");
+            var fullRenderMinuteOutput= document.getElementById("frM");
+            var fullRenderSecondOutput= document.getElementById("frS");
+            var fullRenderTotalFramesOutput= document.getElementById("frTF");
+            
+            var timeLeftDaysOutput= document.getElementById("tlD");
+            var timeLeftHourOutput = document.getElementById("tlH");
+            var timeLeftMinuteOutput= document.getElementById("tlM");
+            var timeLeftSecondOutput= document.getElementById("tlS");
+            var timeLeftFramesLeftOutput= document.getElementById("tlFL");
+            
+            function recalculate() {
+                //full render 
+                let totalFrames = (endFrameInp.value - startFrameInp.value);
+                let time = timeInp.value.split(".");
+                let timeInSeconds = (time[0] * 60) + (time[1]*1);
+                let totalRenderTimeInSeconds = (totalFrames * timeInSeconds);
+                let totalRenderTimeInMinutes = totalRenderTimeInSeconds/60;
+                let totalRenderTimeInHours = totalRenderTimeInMinutes/60;
+                let totalRenderTimeInDays = totalRenderTimeInHours/12;
+                
+                
+                fullRenderTotalFramesOutput.innerHTML = "Total Frames: " + totalFrames;
+                fullRenderDaysOutput.innerHTML = "Days: " + totalRenderTimeInDays.toFixed(2);
+                fullRenderHourOutput.innerHTML = "Hours: " + totalRenderTimeInHours.toFixed(2);
+                fullRenderMinuteOutput.innerHTML = "Minutes: " + totalRenderTimeInMinutes.toFixed(2);
+                fullRenderSecondOutput.innerHTML = "Seconds: " + totalRenderTimeInSeconds;
+                
+                
+                //time left
+                let framesLeft = (totalFrames - currentFrameInp.value);
+                let timeLeftInSeconds = (framesLeft * timeInSeconds);
+                let timeLeftInMinutes = timeLeftInSeconds/60;
+                let timeLeftInHours = timeLeftInMinutes/60;
+                let timeLeftInDays = timeLeftInHours/12;
+                
+                
+                timeLeftDaysOutput.innerHTML = "Days: " + timeLeftInDays.toFixed(2);
+                timeLeftHourOutput .innerHTML = "Hours: " + timeLeftInHours.toFixed(2);
+                timeLeftMinuteOutput.innerHTML = "Minutes: " + timeLeftInMinutes.toFixed(2);
+                timeLeftSecondOutput.innerHTML = "Seconds: " + timeLeftInSeconds;
+                timeLeftFramesLeftOutput.innerHTML = "Frames Left: " + framesLeft;
+            }
+        </script>
+    </body>
+</html>
