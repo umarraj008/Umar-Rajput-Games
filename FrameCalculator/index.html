@@ -25,7 +25,7 @@
             <input type="text" id="cf" placeholder="Enter Current Frame" onkeyup="recalculate()">
             <input type="text" id="t"  placeholder="Enter Time"          onkeyup="recalculate()">
             <br>
-            <input type="button" id="clear" value="Clear All" style="margin-top: 5px">
+            <input type="button" id="clear" value="Clear All" style="margin-top: 5px" onclick="clearAll()">
         </form>
         <br>
         <div id="leftOne">
@@ -94,6 +94,13 @@
                 timeLeftMinuteOutput.innerHTML = "Minutes: " + timeLeftInMinutes.toFixed(2);
                 timeLeftSecondOutput.innerHTML = "Seconds: " + timeLeftInSeconds;
                 timeLeftFramesLeftOutput.innerHTML = "Frames Left: " + framesLeft;
+            }
+            
+            function clearAll() {
+                startFrameInp.value = "";
+                endFrameInp.value = "";
+                currentFrameInp.value = "";
+                timeInp.value = "";
             }
         </script>
     </body>
