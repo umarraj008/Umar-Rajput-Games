@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
     <head>
         <title>Frame Calculator</title>
         <style>
@@ -20,14 +20,18 @@
     <body>
         <h1>Frame Calculator</h1>
         <form>
-            <input type="text" id="sf" placeholder="Enter Start Frame"   onkeyup="recalculate()">
-            <input type="text" id="ef" placeholder="Enter End Frame"     onkeyup="recalculate()">
-            <input type="text" id="cf" placeholder="Enter Current Frame" onkeyup="recalculate()">
-            <input type="text" id="t"  placeholder="Enter Time"          onkeyup="recalculate()">
+            <label>StartFrame:</label>
+            <input type="text" id="sf"  onkeyup="recalculate()" style="width: 50px" placeholder="0000">
+            <label>EndFrame:</label>
+            <input type="text" id="ef"  onkeyup="recalculate()" style="width: 50px" placeholder="0000">
+            <label>CurrentFrame:</label>
+            <input type="text" id="cf"  onkeyup="recalculate()" style="width: 50px" placeholder="0000">
+            <label>Time:</label>
+            <input type="text" id="t"   onkeyup="recalculate()" style="width: 50px" placeholder="00.00">
             <br>
             <input type="button" id="clear" value="Clear All" style="margin-top: 5px" onclick="clearAll()">
         </form>
-        <br>
+        <hr>
         <div id="leftOne">
             <h2>Full Render Time</h2>
             <p id="frTF">Total Frames: </p>
@@ -36,7 +40,6 @@
             <p id="frM">Minutes: </p>
             <p id="frS">Seconds: </p>
         </div>
-        
         <div>
             <h2>Time left</h2>
             <p id="tlFL">Frames Left: </p>
