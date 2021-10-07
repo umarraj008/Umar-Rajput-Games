@@ -4,7 +4,7 @@ ctx.scale(1,1);
 let lastTime = 0;
 
 var dt;
-var moveSpeed = 0.1;
+var moveSpeed = 0.15; //was 0.1
 var score = 0;
 var GlobalSize = 600;
 var gameOver = false;
