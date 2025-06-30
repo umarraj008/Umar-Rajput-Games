@@ -8,7 +8,7 @@ var game;
 
 function startup() {
     resizeWindow();
-    splashScreen.isEnded = false;
+    splashScreen.isEnded = true;
     game = new Game();
     update();
 }

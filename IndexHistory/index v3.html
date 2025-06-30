@@ -1,0 +1,167 @@
+<html>
+    <head>
+        <link href="https://fonts.googleapis.com/css?family=Raleway:100,200,300&display=swap" rel="stylesheet">
+        <title>Game Selector</title>
+        <style>
+            * {
+                padding: 0;
+                margin: 0;
+                font-family: 'Raleway', sans-serif;
+                color: white;
+            }
+            
+            body {
+                background-color: black;
+            }
+            
+            header {
+                font-size: 70px;
+                margin-top: 10px;
+                position: fixed;
+                z-index: 20;
+                margin-left: 25%;
+            }
+            
+            header h1 {
+                font-weight: 100;
+            }
+            
+            .container {
+                max-height: 100%;
+                /*transform: translateY(30px);*/
+                display: block;
+                overflow: hidden;
+            }
+            
+            td {
+                width: 960px;
+                overflow: hidden;
+                height: 100%;
+            }
+            
+            td img {
+                max-height:44%;
+                width: 100%;
+                filter: blur(5px);
+                transition: .4s ease-in-out;
+            }
+            
+            td:hover img {
+                transform: scale(1.2);
+                filter: blur(0px);
+                cursor: pointer;
+            }
+            
+            
+            td h1 {
+                position: absolute;
+                transform: translateY(-90px);
+                margin-left: 40px;
+                transition: .3s ease-in-out;
+                font-size: 50px;
+                font-weight: 200;
+                
+            }
+            
+            td:hover h1 {
+                font-size: 70px;
+                transform: translateY(-130px);
+            }
+            
+            .tag {
+                position: fixed;
+                z-index: 20;
+                font-weight: 200;
+                margin-top: 10px;
+                margin-left: 10px;
+            }
+            
+            .name {
+                font-size: 25px;
+                font-weight: 100;
+            }
+            
+            canvas {
+                width: 100%;
+            }
+            
+            canvas:hover {
+                cursor: pointer;
+            }
+            
+        </style>
+    </head>
+    <body>
+        <h1 class="tag">umarraj008.github.io<br><span class="name">By Umar Rajput</span></h1>
+        <table class="container">
+            <tr>
+                <td>
+                    <img src="MenuImages/xandoPlate.png" onclick="location.href='XandO/index.html'">
+                    <h1>X and O</h1>
+                </td>
+
+                <td>
+                    <img src="MenuImages/tetrisPlate.png" onclick="location.href='Tetris/v2/index.html'">
+                    <h1>Tetris</h1>
+                </td>
+
+                <td>
+                    <img src="MenuImages/flappyPlate.png" onclick="location.href='FlappyBird/index.html'">
+                    <h1>Flappy Bird</h1>
+                </td>
+
+                <td>
+                    <img src="MenuImages/stackerPlate.png" onclick="location.href='Stacker/index.html'">
+                    <h1>Stacker</h1>
+                </td>
+                
+            </tr>
+            
+            <tr>
+                <td>
+                    <img src="MenuImages/snakePlate.png" onclick="location.href='Snake/index.html'">
+                    <h1>Snake</h1>
+                </td>
+
+                <td>
+                    <img src="MenuImages/pongPlate.png" onclick="location.href='Pong/index.html'">
+                    <h1>Tennis For 2</h1>
+                </td>
+
+                <td>
+                    <img src="MenuImages/shooterPlate.png" onclick="location.href='shooter2/index.html'">
+                    <h1>Shooter</h1>
+                </td>
+
+                <td>
+                    <img src="MenuImages/ckickerImg.png" onclick="location.href='clicker/index.html'">
+                    <h1>Clicker</h1>
+                </td>
+            </tr>
+        </table>
+        
+        <!-- 
+        <button onclick="location.href='../index.html'">Game Selector</button>
+
+         button {
+
+                    float:left;
+                    position: absolute;
+                    width: 200px;
+                    height: 70px;
+                    margin-left: 20px;
+                    margin-top: 10px;
+                    font-size: 25px;
+                    font-weight: 200;
+                    transition: .4s ease-in-out;
+                }
+
+                button:hover {
+                    cursor: pointer;
+                    transform: scale(1.3) translateX(20px);;
+                }
+
+        -->
+        
+    </body>
+</html>

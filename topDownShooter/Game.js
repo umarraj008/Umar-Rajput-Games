@@ -97,11 +97,26 @@ class Game {
                 this.x2 = (c.width/2) + (-this.player.range) * Math.cos(this.player.angle);
                 this.y2 = (c.height/2) + (-this.player.range) * Math.sin(this.player.angle);
                 
+                //sort zombies
+                let z1d = Math.sqrt(Math.pow((c.width/2 -this.player.x) - this.zombies[0].x ,2) + Math.pow((c.height/2 -this.player.y) - this.zombies[0].y ,2));
+                
+                for(let i = 1; i < this.zombies.length; i++) {
+                    if (Math.sqrt(Math.pow((c.width/2 -this.player.x) - this.zombies[i].x ,2) + Math.pow((c.height/2 -this.player.y) - this.zombies[i].y ,2)) <= z1d) {
+                        let temp = this.zombies[i];
+                        this.zombies.splice(i, 1);
+                        this.zombies.unshift(temp);
+                    }
+                }
+                this.shootTarget = {x: null, y: null};
                 for(let i = 0; i < this.zombies.length; i++) { //loop through zombiers and see if ray hits them
                     let z = this.zombies[i];
-
-                    if (this.lineRect((c.width/2 - this.player.x) , (c.height/2 - this.player.y), this.x2 - this.player.x, this.y2 - this.player.y, z.x-z.w/2, z.y-z.h/2, z.w, z.h)) {
-                        this.zombies[i].health -= this.player.damage; //damage zombie on colision
+                    this.zombies[i].colSpots = null;
+                    
+                    let col = this.lineRect((c.width/2 - this.player.x) , (c.height/2 - this.player.y), this.x2 - this.player.x, this.y2 - this.player.y, z.x-z.w/2, z.y-z.h/2, z.w, z.h);
+                    if (col.col) {
+                        this.zombies.colSpots = col.sp;
+                        let distance = Math.sqrt(Math.pow((c.width/2 -this.player.x) - z.x ,2) + Math.pow((c.height/2 -this.player.y) - z.y ,2));
+                        this.zombies[i].health -= (this.player.damage/(distance/100)); //damage zombie on colision
                         this.zombies[i].healthBarCounter = 0; 
                         this.zombies[i].showHealthBar = true;
                     }
@@ -113,7 +128,10 @@ class Game {
     drawUI() {
         //shot line
         if (this.playerShoot && this.player.showFireLine) {
-            ctx.strokeStyle = "white";
+            let fireLine = ctx.createLinearGradient(c.width/2, c.height/2, this.x2, this.y2);
+            fireLine.addColorStop(0, "rgba(255,255,255,0.5)");
+            fireLine.addColorStop(1, "rgba(0,0,0,0)");
+            ctx.strokeStyle = fireLine;
             ctx.beginPath();
             ctx.moveTo(c.width/2, c.height/2);
             ctx.lineTo(this.x2, this.y2);
@@ -121,15 +139,7 @@ class Game {
             ctx.lineWidth = 4;
             ctx.stroke();
         }
-        
-        //damage impact
-        for (let i = 0; i < this.temp.length; i++) {
-            ctx.fillStyle = "yellow";
-            ctx.fillRect(this.temp[i].x-5, this.temp[i].y-5, 10, 10);
-        }
-        
-        this.temp = [];
-        
+                
         //sight overlay
         let g = ctx.createRadialGradient(c.width/2,c.height/2, this.player.range/16, c.width/2, c.height/2, this.player.range/1.5);
         g.addColorStop(0, "rgba(0,0,0,0)");
@@ -208,6 +218,10 @@ class Game {
             //if zombie is in screen then draw
             if (zx+100 > 0 && zx <= c.width && zx+100 > 0 && zy <= c.height) {
                 this.zombies[i].draw(this.player.x, this.player.y);
+                if (this.zombies[i].colSpots != null) {
+                    ctx.fillStyle = "red";
+                    ctx.fillRect(this.zombies[i].colSpots.x-2.5, this.zombies[i].colSpots.x-2.5, 5, 5)
+                }
             }
             
             //killed
@@ -223,11 +237,29 @@ class Game {
         let right = this.lineLine(x1,y1,x2,y2, rx+rw,ry, rx+rw,ry+rh);
         let top = this.lineLine(x1,y1,x2,y2, rx,ry, rx+rw,ry);
         let bottom = this.lineLine(x1,y1,x2,y2, rx,ry+rh, rx+rw,ry+rh);
-  
-        if (left || right || top || bottom) {
-            return true;
+        
+        let spots = [];
+        
+        if (left.spot != null) {
+            spots.push(left.spot);
         }
-        return false;
+        
+        if (right.spot != null) {
+            spots.push(right.spot);
+        }
+        
+        if (top.spot != null) {
+            spots.push(top.spot);
+        }
+        
+        if (bottom.spot != null) {
+            spots.push(bottom.spot);
+        }
+        
+        if (left.hasCol || right.hasCol || top.hasCol || bottom.hasCol) {
+            return {col: true, sp: spots};
+        }
+        return {col: false, sp: null};
     }
 
     lineLine(x1, y1, x2, y2, x3, y3, x4, y4) {
@@ -239,11 +271,10 @@ class Game {
             let intersectionX = x1 + (uA * (x2-x1)) + this.player.x;
             let intersectionY = y1 + (uA * (y2-y1)) + this.player.y;
             
-            this.temp.push({x: intersectionX, y: intersectionY});
-            return true;
+            return {hasCol: true, spot: {x: intersectionX, y: intersectionY}};
         }
         
-        return false;
+        return {hasCol: false, spot: null};
     }
     
     getImage(path) {

@@ -7,7 +7,7 @@ class Zombie {
         this.health = 100;
         this.healthBarCounter = 0;
         this.showHealthBar = false;
-        
+        this.colSpots = [];
         this.imageWidth = 128;
         this.animState = 0;
         this.animations = {
@@ -123,8 +123,10 @@ class Zombie {
             ctx.fillRect(this.x+ox-this.w/2, this.y+oy-this.h/2-20, this.w, 10);
             
             //midle
-            ctx.fillStyle = (this.health >= 50) ? "lime" : (this.health < 30) ? "red" : "orange";
-            ctx.fillRect(this.x+ox-this.w/2+2, this.y+oy-this.h/2-20+2, (this.w-4)*(this.health/100), 10-4);
+            if (this.health >= 0) {
+                ctx.fillStyle = (this.health >= 50) ? "lime" : (this.health < 30) ? "red" : "orange";
+                ctx.fillRect(this.x+ox-this.w/2+2, this.y+oy-this.h/2-20+2, (this.w-4)*(this.health/100), 10-4);
+            }
         }
     }
 }

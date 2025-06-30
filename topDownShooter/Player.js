@@ -13,7 +13,7 @@ class Player {
         //player properties
         this.speed = 5;
         this.health = 100;
-        this.sight = 0;
+        this.sight = 95;
         
         //gun properties
         this.damage = 10;
