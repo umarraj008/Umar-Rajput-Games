@@ -1,0 +1,37 @@
+<html>
+    <head>
+        <title>Cards Against Humanity</title>
+		<link href="https://fonts.googleapis.com/css?family=Roboto:300,400,700&display=swap" rel="stylesheet">
+        <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+        <style>
+            body {
+                background-color:  black;
+				            
+            }
+            
+            * {
+                margin: 0;
+                padding: 0;
+                font-family: Roboto;
+            }
+            canvas#canvas {
+                /*width: 80%;*/
+                position: absolute;
+                margin-left: 3%;
+                margin-right: 3%;
+                width: 94vmax;
+                height: 46vmax;
+                overflow: hidden;
+            }
+            
+        </style>
+    </head>
+    <body>
+        <!-- DOM ELEMENTS -->
+        <canvas id="canvas" width="1920" height="1080"></canvas>
+        <!-- SCRIPTS -->
+        
+        <script src="client.js"></script>
+        <script src="main.js"></script>
+    </body>
+</html>
